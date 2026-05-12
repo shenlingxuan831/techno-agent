@@ -11,7 +11,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.runtime import Runtime
 from coze_coding_dev_sdk import LLMClient
 from coze_coding_utils.runtime_ctx.context import Context
+from graphs.planning import should_skip_track
 from graphs.state import PolicySearchInput, PolicySearchOutput
+
+_TRACK_ID = "policy_search"
 
 
 def policy_search_node(
@@ -25,7 +28,10 @@ def policy_search_node(
     integrations: 大语言模型
     """
     ctx = runtime.context
-    
+
+    if should_skip_track(state.enabled_tracks, _TRACK_ID):
+        return PolicySearchOutput(policy_recommendations=[])
+
     # 从config的metadata读取LLM配置路径
     llm_cfg_path = config.get('metadata', {}).get('llm_cfg', 'config/policy_search_llm_cfg.json')
     cfg_file = os.path.join(os.getenv('COZE_WORKSPACE_PATH', '/workspace/projects'), llm_cfg_path)

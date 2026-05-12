@@ -1,6 +1,8 @@
 import argparse
 import asyncio
+import inspect
 import json
+from pathlib import Path
 import threading
 import traceback
 import logging
@@ -9,9 +11,10 @@ import cozeloop
 import uvicorn
 import time
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from langchain_core.runnables import RunnableConfig
-from langgraph.graph import StateGraph, END
+from langgraph.graph import StateGraph, END, START
 from langgraph.graph.state import CompiledStateGraph
 from coze_coding_utils.runtime_ctx.context import new_context, Context
 from coze_coding_utils.helper import graph_helper
@@ -40,6 +43,29 @@ from coze_coding_utils.log.loop_trace import init_run_config, init_agent_config
 
 # 超时配置常量
 TIMEOUT_SECONDS = 900  # 15分钟
+
+
+def _get_graph_node_func_with_inout(graph, node_name: str):
+    """Resolve by LangGraph node id (add_node name), not Python function __name__.
+
+    coze_coding_utils.graph_helper matches node_name to _func.__name__, which breaks
+    when id is e.g. tech_doc_extract but the callable is tech_doc_extract_node.
+    """
+    for node_id, node in graph.nodes.items():
+        if node_id in (START, END):
+            continue
+        if node_id != node_name:
+            continue
+        if not node.data:
+            continue
+        _func = node.data.func
+        sig = inspect.signature(_func)
+        params = list(sig.parameters.values())
+        input_cls = params[0].annotation if params else None
+        output_cls = graph_helper.ParamExtractHelper.get_concrete_return_class(_func)
+        return _func, input_cls, output_cls
+    return None, None, None
+
 
 class GraphService:
     def __init__(self):
@@ -192,7 +218,7 @@ class GraphService:
             ctx = new_context(method="node_run")
 
         _graph = self._get_graph()
-        node_func, input_cls, output_cls = graph_helper.get_graph_node_func_with_inout(_graph.get_graph(), node_id)
+        node_func, input_cls, output_cls = _get_graph_node_func_with_inout(_graph.get_graph(), node_id)
         if node_func is None or input_cls is None:
             raise KeyError(f"node_id '{node_id}' not found")
 
@@ -235,6 +261,35 @@ class GraphService:
 
 service = GraphService()
 app = FastAPI()
+
+_WEBUI_DIR = Path(__file__).resolve().parent / "webui"
+
+
+@app.get("/api/ui/workflow_nodes")
+async def ui_workflow_nodes():
+    """供浏览器控制台加载节点下拉列表（与 LangGraph add_node 的 id 一致）。"""
+    if graph_helper.is_agent_proj():
+        return {"nodes": []}
+    try:
+        g = service._get_graph()
+        raw = g.get_graph()
+        nodes = [nid for nid in raw.nodes.keys() if nid not in (START, END)]
+        return {"nodes": sorted(nodes)}
+    except Exception as e:
+        logger.warning("ui_workflow_nodes: %s", e)
+        return {"nodes": [], "error": str(e)}
+
+
+app.mount(
+    "/ui",
+    StaticFiles(directory=str(_WEBUI_DIR), html=True),
+    name="webui",
+)
+
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/ui/")
 
 # OpenAI 兼容接口处理器
 openai_handler = OpenAIChatHandler(service)

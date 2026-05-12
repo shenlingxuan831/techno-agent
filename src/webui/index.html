@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>工作流试运行</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --border: #2d3a4d;
+      --text: #e7eef8;
+      --muted: #8b9cb3;
+      --accent: #4ea1ff;
+      --ok: #3ecf8e;
+      --err: #ff6b6b;
+      --warn: #f0c14b;
+      --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+      --sans: "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+    }
+    .card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.35rem; }
+    select, textarea, button {
+      width: 100%;
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0d1117;
+      color: var(--text);
+    }
+    select { padding: 0.5rem 0.65rem; cursor: pointer; }
+    textarea {
+      min-height: 220px;
+      padding: 0.65rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      resize: vertical;
+      line-height: 1.45;
+    }
+    textarea:focus, select:focus {
+      outline: 2px solid rgba(78, 161, 255, 0.45);
+      outline-offset: 1px;
+    }
+    .modes {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.85rem;
+    }
+    .modes label.mode {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin: 0;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0d1117;
+    }
+    .modes input { width: auto; accent-color: var(--accent); }
+    .row-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    button.primary {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.65rem 1rem;
+      border: none;
+      background: linear-gradient(180deg, #3d8eef 0%, #2a6fc7 100%);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(42, 111, 199, 0.35);
+    }
+    button.primary:hover { filter: brightness(1.06); }
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: none;
+    }
+    button.ghost {
+      padding: 0.65rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    button.ghost:hover { color: var(--text); border-color: var(--muted); }
+    .meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    .meta .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(62, 207, 142, 0.15);
+      color: var(--ok);
+      margin-right: 0.5rem;
+    }
+    .meta .pill.err { background: rgba(255, 107, 107, 0.15); color: var(--err); }
+    #out-tree {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      max-height: min(60vh, 520px);
+      overflow: auto;
+      padding: 0.5rem 0;
+    }
+    .j-null { color: var(--muted); }
+    .j-key { color: #7eb6ff; }
+    .j-str { color: #9ee4a8; }
+    .j-num { color: #f0c14b; }
+    .j-bool { color: #c59eff; }
+    details.j-node { margin: 0.15rem 0 0.15rem 0.5rem; border-left: 1px solid var(--border); padding-left: 0.45rem; }
+    details.j-node > summary {
+      cursor: pointer;
+      list-style: none;
+      color: var(--muted);
+      user-select: none;
+    }
+    details.j-node > summary::-webkit-details-marker { display: none; }
+    .j-line { padding: 0.1rem 0; }
+    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+    .node-row.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>科技成果转化 · 工作流试运行</h1>
+    <p class="sub">在浏览器里编辑 JSON，运行单节点或整条流程，结果以可折叠树展示。需先在本机启动 HTTP 服务（见仓库说明）。</p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>请求</h2>
+        <div class="modes">
+          <label class="mode"><input type="radio" name="mode" value="node" checked /> 单节点</label>
+          <label class="mode"><input type="radio" name="mode" value="flow" /> 全流程</label>
+        </div>
+        <div class="node-row" id="nodeRow">
+          <label for="nodeSelect">节点 ID</label>
+          <select id="nodeSelect"></select>
+          <p class="hint">列表来自当前已加载的 LangGraph（需设置 COZE_WORKSPACE_PATH / PYTHONPATH）。</p>
+        </div>
+        <label for="payload">请求体（JSON）</label>
+        <textarea id="payload" spellcheck="false"></textarea>
+        <div class="row-actions">
+          <button type="button" class="primary" id="btnRun">运行</button>
+          <button type="button" class="ghost" id="btnSampleNode">填入单节点示例</button>
+          <button type="button" class="ghost" id="btnSampleFlow">填入流程示例</button>
+        </div>
+        <p class="meta" id="runMeta"></p>
+      </div>
+
+      <div class="card">
+        <h2>响应</h2>
+        <div id="out-tree"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SAMPLE_NODE = {
+      tech_document: { url: "e:\\cursor_files\\slx_01\\demo_tech.txt" }
+    };
+    const SAMPLE_FLOW = {
+      tech_document: { url: "e:\\cursor_files\\slx_01\\demo_tech.txt" },
+      user_type: "高校",
+      contact_info: "demo@example.com",
+      specific_requirements: ""
+    };
+
+    const payloadEl = document.getElementById("payload");
+    const nodeSelect = document.getElementById("nodeSelect");
+    const nodeRow = document.getElementById("nodeRow");
+    const outTree = document.getElementById("out-tree");
+    const btnRun = document.getElementById("btnRun");
+    const runMeta = document.getElementById("runMeta");
+
+    payloadEl.value = JSON.stringify(SAMPLE_NODE, null, 2);
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderValue(val, depth) {
+      if (val === null) return '<span class="j-null">null</span>';
+      const t = typeof val;
+      if (t === "boolean") return '<span class="j-bool">' + val + "</span>";
+      if (t === "number") return '<span class="j-num">' + val + "</span>";
+      if (t === "string") return '<span class="j-str">"' + escapeHtml(val) + '"</span>';
+      if (Array.isArray(val)) {
+        if (val.length === 0) return '<span class="j-line">[]</span>';
+        let inner = "";
+        val.forEach((item, i) => {
+          inner += '<details class="j-node open" open><summary>[' + i + ']</summary>' + renderValue(item, depth + 1) + "</details>";
+        });
+        return inner;
+      }
+      if (t === "object") {
+        const keys = Object.keys(val);
+        if (keys.length === 0) return '<span class="j-line">{}</span>';
+        let inner = "";
+        keys.forEach((k) => {
+          inner += '<details class="j-node open" open><summary><span class="j-key">' + escapeHtml(k) + "</span></summary>" + renderValue(val[k], depth + 1) + "</details>";
+        });
+        return inner;
+      }
+      return escapeHtml(String(val));
+    }
+
+    function renderResult(data) {
+      outTree.innerHTML = renderValue(data, 0);
+    }
+
+    async function loadNodes() {
+      nodeSelect.innerHTML = "";
+      try {
+        const r = await fetch("/api/ui/workflow_nodes");
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const j = await r.json();
+        const nodes = j.nodes || [];
+        if (!nodes.length) {
+          nodeSelect.innerHTML = "<option value=\"tech_doc_extract\">tech_doc_extract（回退）</option>";
+          return;
+        }
+        nodes.forEach((id) => {
+          const o = document.createElement("option");
+          o.value = id;
+          o.textContent = id;
+          nodeSelect.appendChild(o);
+        });
+        if (![...nodeSelect.options].some((o) => o.value === "tech_doc_extract")) {
+          /* keep first */
+        } else {
+          nodeSelect.value = "tech_doc_extract";
+        }
+      } catch (e) {
+        nodeSelect.innerHTML = "<option value=\"tech_doc_extract\">tech_doc_extract（加载列表失败）</option>";
+        console.warn(e);
+      }
+    }
+
+    function updateModeUI() {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      nodeRow.classList.toggle("hidden", mode === "flow");
+    }
+
+    document.querySelectorAll('input[name="mode"]').forEach((el) => {
+      el.addEventListener("change", updateModeUI);
+    });
+
+    document.getElementById("btnSampleNode").addEventListener("click", () => {
+      payloadEl.value = JSON.stringify(SAMPLE_NODE, null, 2);
+      document.querySelector('input[name="mode"][value="node"]').checked = true;
+      updateModeUI();
+    });
+    document.getElementById("btnSampleFlow").addEventListener("click", () => {
+      payloadEl.value = JSON.stringify(SAMPLE_FLOW, null, 2);
+      document.querySelector('input[name="mode"][value="flow"]').checked = true;
+      updateModeUI();
+    });
+
+    btnRun.addEventListener("click", async () => {
+      let body;
+      try {
+        body = JSON.parse(payloadEl.value || "{}");
+      } catch (e) {
+        runMeta.innerHTML = '<span class="pill err">JSON 解析失败</span> ' + escapeHtml(e.message);
+        outTree.innerHTML = "";
+        return;
+      }
+
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const url = mode === "flow" ? "/run" : "/node_run/" + encodeURIComponent(nodeSelect.value);
+      runMeta.textContent = "运行中…";
+      outTree.innerHTML = "";
+      btnRun.disabled = true;
+      const t0 = performance.now();
+
+      try {
+        const r = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const ms = Math.round(performance.now() - t0);
+        const text = await r.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { _raw: text };
+        }
+        if (!r.ok) {
+          runMeta.innerHTML = '<span class="pill err">HTTP ' + r.status + "</span> 耗时 " + ms + " ms";
+          renderResult(data);
+          return;
+        }
+        runMeta.innerHTML = '<span class="pill">完成</span> 耗时 ' + ms + " ms · " + (mode === "flow" ? "/run" : url);
+        renderResult(data);
+      } catch (e) {
+        const ms = Math.round(performance.now() - t0);
+        runMeta.innerHTML = '<span class="pill err">网络错误</span> ' + ms + " ms";
+        renderResult({ error: String(e.message || e) });
+      } finally {
+        btnRun.disabled = false;
+      }
+    });
+
+    updateModeUI();
+    loadNodes();
+  </script>
+</body>
+</html>

@@ -14,6 +14,16 @@ from coze_coding_utils.runtime_ctx.context import Context
 from graphs.state import CommercialEvalInput, CommercialEvalOutput
 
 
+def _as_str_list(val) -> list:
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return [str(x).strip() for x in val if str(x).strip()]
+    if isinstance(val, str) and val.strip():
+        return [val.strip()]
+    return []
+
+
 def commercial_eval_node(
     state: CommercialEvalInput,
     config: RunnableConfig,
@@ -80,8 +90,13 @@ def commercial_eval_node(
             'summary': result_text[:500]
         }
     
+    next_steps = _as_str_list(eval_result.get("commercial_next_steps"))
+    diligence = _as_str_list(eval_result.get("due_diligence_topics"))
+
     return CommercialEvalOutput(
         commercial_potential=eval_result,
         market_size=eval_result.get('market_size', '待评估'),
-        competitive_advantage=eval_result.get('competitive_advantage', '待评估')
+        competitive_advantage=eval_result.get('competitive_advantage', '待评估'),
+        commercial_next_steps=next_steps,
+        due_diligence_topics=diligence,
     )

@@ -10,8 +10,18 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.runtime import Runtime
 from coze_coding_dev_sdk import LLMClient
-from coze_coding_utils.runtime_ctx.context import Context, new_context
+from coze_coding_utils.runtime_ctx.context import Context
 from graphs.state import TechAnalysisInput, TechAnalysisOutput
+
+
+def _as_str_list(val) -> list:
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return [str(x).strip() for x in val if str(x).strip()]
+    if isinstance(val, str) and val.strip():
+        return [val.strip()]
+    return []
 
 
 def tech_analysis_node(
@@ -78,8 +88,13 @@ def tech_analysis_node(
             'summary': result_text[:500]
         }
     
+    downstream_focus = _as_str_list(analysis_result.get("downstream_focus"))
+    retrieval_queries = _as_str_list(analysis_result.get("retrieval_queries"))
+
     return TechAnalysisOutput(
         tech_analysis=analysis_result,
         tech_maturity=analysis_result.get('tech_maturity', '待评估'),
-        tech_innovation=analysis_result.get('tech_innovation', '待评估')
+        tech_innovation=analysis_result.get('tech_innovation', '待评估'),
+        downstream_focus=downstream_focus,
+        retrieval_queries=retrieval_queries,
     )

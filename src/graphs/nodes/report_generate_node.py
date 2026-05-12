@@ -134,3 +134,15 @@ def report_generate_node(
     except Exception as e:
         print(f"报告生成失败: {str(e)}")
         raise Exception(f"报告生成失败: {str(e)}")
+
+
+def report_generate_degraded_node(
+    state: ReportGenerateInput,
+    config: RunnableConfig,
+    runtime: Runtime[Context]
+) -> ReportGenerateOutput:
+    """
+    title: 报告生成（降级入口）
+    desc: 与 report_generate 相同逻辑，用于质量门失败等不经过并行汇聚的路径
+    """
+    return report_generate_node(state, config, runtime)
