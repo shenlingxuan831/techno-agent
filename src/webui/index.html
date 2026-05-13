@@ -188,6 +188,7 @@
         <div class="modes">
           <label class="mode"><input type="radio" name="mode" value="node" checked /> 单节点</label>
           <label class="mode"><input type="radio" name="mode" value="flow" /> 全流程</label>
+          <label class="mode"><input type="radio" name="mode" value="bp" /> 简版 BP</label>
         </div>
         <div class="node-row" id="nodeRow">
           <label for="nodeSelect">节点 ID</label>
@@ -200,6 +201,7 @@
           <button type="button" class="primary" id="btnRun">运行</button>
           <button type="button" class="ghost" id="btnSampleNode">填入单节点示例</button>
           <button type="button" class="ghost" id="btnSampleFlow">填入流程示例</button>
+          <button type="button" class="ghost" id="btnSampleBp">填入简版 BP 示例</button>
         </div>
         <p class="meta" id="runMeta"></p>
       </div>
@@ -220,6 +222,12 @@
       user_type: "高校",
       contact_info: "demo@example.com",
       specific_requirements: ""
+    };
+    const SAMPLE_BP = {
+      tech_document: { url: "e:\\cursor_files\\slx_01\\demo_tech.txt", file_type: "document" },
+      user_type: "高校",
+      contact_info: "demo@example.com",
+      specific_requirements: "初版目录 BP，先打通生成与落盘"
     };
 
     const payloadEl = document.getElementById("payload");
@@ -299,7 +307,7 @@
 
     function updateModeUI() {
       const mode = document.querySelector('input[name="mode"]:checked').value;
-      nodeRow.classList.toggle("hidden", mode === "flow");
+      nodeRow.classList.toggle("hidden", mode === "flow" || mode === "bp");
     }
 
     document.querySelectorAll('input[name="mode"]').forEach((el) => {
@@ -316,6 +324,11 @@
       document.querySelector('input[name="mode"][value="flow"]').checked = true;
       updateModeUI();
     });
+    document.getElementById("btnSampleBp").addEventListener("click", () => {
+      payloadEl.value = JSON.stringify(SAMPLE_BP, null, 2);
+      document.querySelector('input[name="mode"][value="bp"]').checked = true;
+      updateModeUI();
+    });
 
     btnRun.addEventListener("click", async () => {
       let body;
@@ -328,7 +341,10 @@
       }
 
       const mode = document.querySelector('input[name="mode"]:checked').value;
-      const url = mode === "flow" ? "/run" : "/node_run/" + encodeURIComponent(nodeSelect.value);
+      let url;
+      if (mode === "flow") url = "/run";
+      else if (mode === "bp") url = "/run_bp_simple";
+      else url = "/node_run/" + encodeURIComponent(nodeSelect.value);
       runMeta.textContent = "运行中…";
       outTree.innerHTML = "";
       btnRun.disabled = true;
@@ -353,7 +369,8 @@
           renderResult(data);
           return;
         }
-        runMeta.innerHTML = '<span class="pill">完成</span> 耗时 ' + ms + " ms · " + (mode === "flow" ? "/run" : url);
+        const pathLabel = mode === "flow" ? "/run" : mode === "bp" ? "/run_bp_simple" : url;
+        runMeta.innerHTML = '<span class="pill">完成</span> 耗时 ' + ms + " ms · " + pathLabel;
         renderResult(data);
       } catch (e) {
         const ms = Math.round(performance.now() - t0);

@@ -13,6 +13,9 @@ __pycache__/
 /.env
 .env
 
+# 简版 BP 等运行产物
+/output/
+
 # 视频文件
 *.mp4
 *.avi

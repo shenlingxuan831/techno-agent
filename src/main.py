@@ -2,12 +2,31 @@ import argparse
 import asyncio
 import inspect
 import json
+import os
+import sys
 from pathlib import Path
 import threading
 import traceback
 import logging
 from typing import Any, Dict, Iterable, AsyncIterable, AsyncGenerator, Optional
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None  # type: ignore
+else:
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
 import cozeloop
+
+def _slx_local_no_coze_loop() -> bool:
+    return os.getenv("SLX_LOCAL_NO_COZE_LOOP", "").strip().lower() in ("1", "true", "yes")
+
+if _slx_local_no_coze_loop():
+    from slx_local_noop import install_silent_loop_client
+
+    install_silent_loop_client()
+
 import uvicorn
 import time
 from fastapi import FastAPI, HTTPException, Request
@@ -38,7 +57,11 @@ from coze_coding_utils.helper.agent_helper import to_stream_input
 from coze_coding_utils.openai.handler import OpenAIChatHandler
 from coze_coding_utils.log.parser import LangGraphParser
 from coze_coding_utils.log.err_trace import extract_core_stack
-from coze_coding_utils.log.loop_trace import init_run_config, init_agent_config
+
+if _slx_local_no_coze_loop():
+    from slx_local_loop_trace import init_run_config, init_agent_config
+else:
+    from coze_coding_utils.log.loop_trace import init_run_config, init_agent_config
 
 
 # 超时配置常量
@@ -144,6 +167,29 @@ class GraphService:
         finally:
             # 清理任务记录
             self.running_tasks.pop(run_id, None)
+
+    async def run_bp_simple(self, payload: Dict[str, Any], ctx=None) -> Dict[str, Any]:
+        """简版科技成果转化 BP：提取文档 → 按固定目录生成 Markdown → 写入 output/。"""
+        from graphs.bp_simple.graph import bp_simple_graph
+
+        if ctx is None:
+            ctx = new_context("bp_simple")
+
+        run_id = ctx.run_id
+        logger.info(f"Starting bp_simple with run_id: {run_id}")
+
+        run_config = init_run_config(bp_simple_graph, ctx)
+        run_config["configurable"] = {"thread_id": ctx.run_id}
+
+        try:
+            return await bp_simple_graph.ainvoke(payload, config=run_config, context=ctx)
+        except Exception as e:
+            err = self.error_classifier.classify(e, {"node_name": "bp_simple", "run_id": run_id})
+            logger.error(
+                f"Error in GraphService.run_bp_simple: [{err.code}] {err.message}\n"
+                f"Traceback:\n{extract_core_stack()}"
+            )
+            raise
 
     # 流式运行（SSE 格式化）：HTTP 路由使用
     async def stream_sse(self, payload: Dict[str, Any], ctx=None, run_opt: Optional[RunOpt] = None) -> AsyncGenerator[str, None]:
@@ -377,6 +423,40 @@ async def http_run(request: Request) -> Dict[str, Any]:
         cozeloop.flush()
 
 
+@app.post("/run_bp_simple")
+async def http_run_bp_simple(request: Request) -> Dict[str, Any]:
+    """简版 BP 工作流：输入与主流程类似（tech_document + user_type 等），输出 bp_markdown + bp_file_path。"""
+    raw_body = await request.body()
+    try:
+        body_text = raw_body.decode("utf-8")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid body: {e}")
+
+    ctx = new_context(method="bp_simple", headers=request.headers)
+    request_context.set(ctx)
+    logger.info(f"/run_bp_simple run_id={ctx.run_id} body_len={len(body_text)}")
+
+    try:
+        payload = json.loads(body_text)
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
+
+    try:
+        return await service.run_bp_simple(payload, ctx)
+    except Exception as e:
+        error_response = service.error_classifier.get_error_response(e, {"node_name": "run_bp_simple"})
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error_code": error_response["error_code"],
+                "error_message": error_response["error_message"],
+                "stack_trace": extract_core_stack(),
+            },
+        )
+    finally:
+        cozeloop.flush()
+
+
 HEADER_X_WORKFLOW_STREAM_MODE = "x-workflow-stream-mode"
 
 
@@ -537,23 +617,39 @@ async def http_graph_inout_parameter(request: Request):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Start FastAPI server")
-    parser.add_argument("-m", type=str, default="http", help="Run mode, support http,flow,node")
+    parser.add_argument("-m", type=str, default="http", help="Run mode, support http,flow,node,bp")
     parser.add_argument("-n", type=str, default="", help="Node ID for single node run")
     parser.add_argument("-p", type=int, default=5000, help="HTTP server port")
-    parser.add_argument("-i", type=str, default="", help="Input JSON string for flow/node mode")
+    parser.add_argument(
+        "-i",
+        type=str,
+        default="",
+        help='JSON 字符串（Windows PowerShell 若内容含空格易被拆参，请改用 --json-file）',
+    )
+    parser.add_argument(
+        "--json-file",
+        type=str,
+        default="",
+        metavar="PATH",
+        help="从 UTF-8 JSON 文件读取请求体（推荐：flow / node / bp 模式）",
+    )
     return parser.parse_args()
 
 
 def parse_input(input_str: str) -> Dict[str, Any]:
-    """Parse input string, support both JSON string and plain text"""
+    """Parse input string, plain or JSON; 支持 @path 从文件加载。"""
     if not input_str:
         return {"text": "你好"}
 
-    # Try to parse as JSON first
+    s = input_str.strip()
+    if s.startswith("@"):
+        path = s[1:].strip().strip('"')
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+
     try:
-        return json.loads(input_str)
+        return json.loads(s)
     except json.JSONDecodeError:
-        # If not valid JSON, treat as plain text
         return {"text": input_str}
 
 def start_http_server(port):
@@ -565,18 +661,38 @@ def start_http_server(port):
     logger.info(f"Start HTTP Server, Port: {port}, Workers: {workers}")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=reload, workers=workers)
 
+
+def _cli_print_json(obj: Dict[str, Any]) -> None:
+    line = json.dumps(obj, ensure_ascii=False, indent=2) + "\n"
+    try:
+        sys.stdout.buffer.write(line.encode("utf-8", errors="replace"))
+    except (AttributeError, OSError):
+        print(line, end="")
+
+
 if __name__ == "__main__":
     args = parse_args()
+
+    def _cli_payload() -> Dict[str, Any]:
+        if getattr(args, "json_file", ""):
+            with open(args.json_file, encoding="utf-8") as f:
+                return json.load(f)
+        return parse_input(args.i)
+
     if args.m == "http":
         start_http_server(args.p)
     elif args.m == "flow":
-        payload = parse_input(args.i)
+        payload = _cli_payload()
         result = asyncio.run(service.run(payload))
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _cli_print_json(result)
     elif args.m == "node" and args.n:
-        payload = parse_input(args.i)
+        payload = _cli_payload()
         result = asyncio.run(service.run_node(args.n, payload))
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _cli_print_json(result)
+    elif args.m == "bp":
+        payload = _cli_payload()
+        result = asyncio.run(service.run_bp_simple(payload))
+        _cli_print_json(result)
     elif args.m == "agent":
         agent_ctx = new_context(method="agent")
         for chunk in service.stream(
