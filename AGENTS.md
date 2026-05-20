@@ -1,5 +1,7 @@
 # 科技成果转化智能体项目
 
+> **实现路径提示**：模块化长流程（按大纲写库、汇总）见 `src/kt_workflow/` 与 `docs/kt_workflow_*.md`；人文 BP 标准见 `docs/bp_research_commercialization_*.md`。本文件中的节点路径描述以 **主 LangGraph** `src/graphs/` 为准，与 `kt_workflow` 目录并存。
+
 ## 项目概述
 
 - **名称**: 科技成果转化智能体

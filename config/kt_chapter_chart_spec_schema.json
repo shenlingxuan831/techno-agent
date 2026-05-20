@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "description": "bp_module_chart 的 JSON 内容约定（slug 与对应 bp_module_text 模块 id 相同）",
+  "required_fields": ["schema_version", "chart_type", "title", "spec"],
+  "chart_type_enum": ["table", "mermaid", "image_ref", "placeholder"],
+  "examples": {
+    "table": {
+      "schema_version": 1,
+      "chart_type": "table",
+      "title": "技术参数对比",
+      "spec": {
+        "columns": ["指标", "本项目", "行业标准", "竞品A", "备注"],
+        "rows": [
+          ["精度", "±0.1%", "±0.5%", "±0.3%", "【事实】"]
+        ],
+        "caption": "表：核心参数对比（来源见页脚）"
+      },
+      "evidence_tags": ["事实", "推断", "待验证"]
+    },
+    "mermaid": {
+      "schema_version": 1,
+      "chart_type": "mermaid",
+      "title": "技术原理流程",
+      "spec": {
+        "diagram_type": "flowchart",
+        "source": "flowchart LR\n  A[输入] --> B[处理] --> C[输出]"
+      }
+    },
+    "image_ref": {
+      "schema_version": 1,
+      "chart_type": "image_ref",
+      "title": "路线图",
+      "spec": {
+        "storage_uri": "var/kt_workflow/runs/<run_id>/charts/roadmap.png",
+        "alt": "发展路线图"
+      }
+    }
+  }
+}

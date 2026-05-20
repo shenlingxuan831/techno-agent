@@ -16,6 +16,12 @@ __pycache__/
 # 简版 BP 等运行产物
 /output/
 
+# kt_workflow：每次运行的 SQLite、Markdown/PDF、日志（均在仓库 var 下）
+/var/kt_workflow/
+
+# 历史默认路径；可删旧文件。新建库见 var/kt_workflow/databases/
+/data/
+
 # 视频文件
 *.mp4
 *.avi

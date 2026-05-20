@@ -8,4 +8,4 @@ if (Test-Path .\.env) {
     }
   }
 }
-.\.venv\Scripts\python.exe src\main.py -m bp --json-file payload_bp_simple.json
+.\.venv\Scripts\python.exe src\main.py -m bp --json-file payloads\payload_bp_simple.json

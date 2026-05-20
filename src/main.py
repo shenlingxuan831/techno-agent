@@ -191,6 +191,44 @@ class GraphService:
             )
             raise
 
+    async def run_kt_workflow(self, payload: Dict[str, Any], ctx=None) -> Dict[str, Any]:
+        """模块化科技成果转化长流程（DB 为中心）；见 kt_workflow 包与 docs/kt_workflow_setup.md。"""
+        import uuid
+
+        from kt_workflow.bootstrap import ensure_schema
+        from kt_workflow.db import session as kt_session
+        from kt_workflow.graph import kt_workflow_graph
+
+        if ctx is None:
+            ctx = new_context("kt_workflow")
+
+        run_id = ctx.run_id
+        project_id = str(uuid.uuid4())
+        logger.info(f"Starting kt_workflow with run_id: {run_id}")
+
+        kt_session.bind_sqlite_run(run_id)
+        try:
+            ensure_schema()
+
+            run_config = init_run_config(kt_workflow_graph, ctx)
+            run_config["configurable"] = {"thread_id": ctx.run_id}
+
+            merged = {
+                **payload,
+                "project_id": project_id,
+                "run_id": run_id,
+            }
+            return await kt_workflow_graph.ainvoke(merged, config=run_config, context=ctx)
+        except Exception as e:
+            err = self.error_classifier.classify(e, {"node_name": "kt_workflow", "run_id": run_id})
+            logger.error(
+                f"Error in GraphService.run_kt_workflow: [{err.code}] {err.message}\n"
+                f"Traceback:\n{extract_core_stack()}"
+            )
+            raise
+        finally:
+            kt_session.clear_sqlite_run_binding()
+
     # 流式运行（SSE 格式化）：HTTP 路由使用
     async def stream_sse(self, payload: Dict[str, Any], ctx=None, run_opt: Optional[RunOpt] = None) -> AsyncGenerator[str, None]:
         if ctx is None:
@@ -457,6 +495,46 @@ async def http_run_bp_simple(request: Request) -> Dict[str, Any]:
         cozeloop.flush()
 
 
+@app.post("/run_kt_workflow")
+async def http_run_kt_workflow(request: Request) -> Dict[str, Any]:
+    """科技成果转化模块化长流程（`kt_workflow`）：与 CLI `-m kt` 同一套 `run_kt_workflow` 逻辑，便于 Coze / 外部 HTTP 触发。"""
+    raw_body = await request.body()
+    try:
+        body_text = raw_body.decode("utf-8")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid body: {e}")
+
+    ctx = new_context(method="kt_workflow", headers=request.headers)
+    upstream_run_id = request.headers.get(HEADER_X_RUN_ID)
+    if upstream_run_id:
+        ctx.run_id = upstream_run_id
+    request_context.set(ctx)
+    logger.info(f"/run_kt_workflow run_id={ctx.run_id} body_len={len(body_text)}")
+
+    try:
+        payload = json.loads(body_text)
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
+
+    try:
+        result = await service.run_kt_workflow(payload, ctx)
+        if isinstance(result, dict) and "run_id" not in result:
+            result["run_id"] = ctx.run_id
+        return result
+    except Exception as e:
+        error_response = service.error_classifier.get_error_response(e, {"node_name": "run_kt_workflow"})
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error_code": error_response["error_code"],
+                "error_message": error_response["error_message"],
+                "stack_trace": extract_core_stack(),
+            },
+        )
+    finally:
+        cozeloop.flush()
+
+
 HEADER_X_WORKFLOW_STREAM_MODE = "x-workflow-stream-mode"
 
 
@@ -617,7 +695,7 @@ async def http_graph_inout_parameter(request: Request):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Start FastAPI server")
-    parser.add_argument("-m", type=str, default="http", help="Run mode, support http,flow,node,bp")
+    parser.add_argument("-m", type=str, default="http", help="Run mode: http,flow,node,bp,kt")
     parser.add_argument("-n", type=str, default="", help="Node ID for single node run")
     parser.add_argument("-p", type=int, default=5000, help="HTTP server port")
     parser.add_argument(
@@ -631,7 +709,7 @@ def parse_args():
         type=str,
         default="",
         metavar="PATH",
-        help="从 UTF-8 JSON 文件读取请求体（推荐：flow / node / bp 模式）",
+        help="从 UTF-8 JSON 读取请求体（flow / node / bp / kt）",
     )
     return parser.parse_args()
 
@@ -692,6 +770,10 @@ if __name__ == "__main__":
     elif args.m == "bp":
         payload = _cli_payload()
         result = asyncio.run(service.run_bp_simple(payload))
+        _cli_print_json(result)
+    elif args.m == "kt":
+        payload = _cli_payload()
+        result = asyncio.run(service.run_kt_workflow(payload))
         _cli_print_json(result)
     elif args.m == "agent":
         agent_ctx = new_context(method="agent")

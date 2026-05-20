@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "description": "llm_source_analysis artifact 的 JSON 根对象字段（由 kt_analyze + config/kt_source_analysis_llm_cfg.json 产出）",
+  "artifact_type": "llm_source_analysis",
+  "slug": "default",
+  "fields": {
+    "summary": "200字以内技术/成果概述",
+    "tech_name": "技术或成果名称",
+    "trl_level": "TRL 或约 X 级",
+    "trl_rationale": "成熟度判断依据",
+    "tech_innovation": "高/中/低",
+    "innovation_detail": "创新性说明",
+    "advantages": "优势列表 string[]",
+    "disadvantages": "劣势或风险 string[]",
+    "application_scenarios": "应用场景 string[]",
+    "target_market": "目标市场与客户类型",
+    "competitive_landscape": "竞品或替代方案",
+    "ip_status": "知识产权与权属",
+    "team_and_resources": "团队、实验室、设备",
+    "commercialization_barriers": "产业化障碍 string[]",
+    "policy_fit_hint": "政策/资质方向",
+    "keywords": "关键词 string[]",
+    "data_gaps": "材料缺失项 string[]"
+  },
+  "merged_into": "structured_profile.analysis（由 kt_structure 写入）"
+}
