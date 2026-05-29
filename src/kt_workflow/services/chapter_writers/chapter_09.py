@@ -134,6 +134,8 @@ Markdown 正文（及可选图表 JSON），写入 `bp_module_text` / `bp_module
 
 from __future__ import annotations
 
+from typing import Any
+
 from kt_workflow.services.chapter_writer_contract import ChapterWriterContext, ModuleChartSpec
 from kt_workflow.services.chapter_writers._base import BaseChapterWriter
 
@@ -158,9 +160,12 @@ class Chapter09Writer(BaseChapterWriter):
         mod = ctx["module"]
         module_id = mod.get("id", "")
 
-        # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch9_9_1":
-        #     return self._write_bp_ch9_9_1(ctx)
+        if module_id == "bp_ch9_9_1":
+            return self._write_bp_ch9_9_1(ctx)
+        if module_id == "bp_ch9_9_2":
+            return self._write_bp_ch9_9_2(ctx)
+        if module_id == "bp_ch9_9_3":
+            return self._write_bp_ch9_9_3(ctx)
 
         # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
@@ -180,3 +185,98 @@ class Chapter09Writer(BaseChapterWriter):
     #
     # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
     # ------------------------------------------------------------------
+
+    def _write_bp_ch9_9_1(self, ctx: ChapterWriterContext) -> str:
+        """写 9.1 项目可行性结论。"""
+        heading = self.module_heading(ctx)
+        tech_name = self._tech_name(ctx)
+        summary = self._field(ctx, "summary", "材料尚未形成完整成果概述，需结合原始技术文档进一步补充。")
+        trl = self._trl(ctx)
+        advantages = self._items(ctx, "advantages")[:2]
+        barriers = self._items(ctx, "commercialization_barriers")[:2]
+        gaps = self._items(ctx, "data_gaps")[:3]
+
+        adv_text = "；".join(advantages) if advantages else "已有材料显示具备一定技术积累和场景适配基础"
+        barrier_text = "；".join(barriers) if barriers else "产业化验证、客户试点和成本收益数据仍需补充"
+        gap_text = self._gap_sentence(gaps)
+
+        return (
+            f"{heading}\n\n"
+            f"【事实】{tech_name}的现有材料显示：{summary}\n\n"
+            f"【推断】结合当前成熟度（{trl}）和已呈现优势（{adv_text}），项目具备进入科研成果转化论证与小规模应用验证的阶段性可行性。"
+            f"但其商业化结论应保持审慎，重点约束在{barrier_text}。建议将本项目定位为“可推进、需验证”的成果转化项目，优先完成中试/试点、知识产权权属、客户需求和成本模型的闭环验证。\n\n"
+            f"> 【待验证】{gap_text}\n"
+        )
+
+    def _write_bp_ch9_9_2(self, ctx: ChapterWriterContext) -> str:
+        """写 9.2 核心价值总结。"""
+        heading = self.module_heading(ctx)
+        tech_name = self._tech_name(ctx)
+        advantages = self._items(ctx, "advantages")[:3]
+        scenarios = self._items(ctx, "application_scenarios")[:2]
+        market = self._field(ctx, "target_market", "目标市场边界尚待进一步明确")
+
+        value_points = advantages or ["提升相关场景的技术效率或性能表现", "为后续产业化合作提供可验证的技术基础"]
+        scenario_text = "；".join(scenarios) if scenarios else "具体落地场景仍需结合客户需求筛选"
+        value_lines = "\n".join(f"- 【事实/推断】{point}" for point in value_points)
+
+        return (
+            f"{heading}\n\n"
+            f"{tech_name}的核心价值不在于把科研成果直接包装成成熟产品，而在于把已有技术能力转化为可被评审、合作方和投资方理解的落地假设。\n\n"
+            f"{value_lines}\n\n"
+            f"【推断】面向{market}，项目后续价值释放应围绕“{scenario_text}”展开，通过验证数据、试点案例和成本收益测算逐步证明其商业可行性。\n"
+        )
+
+    def _write_bp_ch9_9_3(self, ctx: ChapterWriterContext) -> str:
+        """写 9.3 未来展望。"""
+        heading = self.module_heading(ctx)
+        tech_name = self._tech_name(ctx)
+        gaps = self._items(ctx, "data_gaps")[:4]
+        policy = self._field(ctx, "policy_fit_hint", "政策与资质匹配方向仍需补充")
+        gap_text = "；".join(gaps) if gaps else "验证数据、客户试点、财务假设和合作资源"
+
+        return (
+            f"{heading}\n\n"
+            f"下一阶段，{tech_name}应以“补证据、做试点、定边界”为主线推进。短期重点是补齐{gap_text}等材料，形成可复核的实验和应用证明；中期应选择1-2个高匹配场景开展联合验证，沉淀交付流程、成本结构和知识产权使用规则；长期则结合{policy}，逐步扩展产业合作、政策申报和资本对接。\n\n"
+            f"> 【待验证】未来规划中的时间表、预算、客户名单和收入目标，应在取得真实试点或合作材料后再写入正式 BP。\n"
+        )
+
+    def _tech_name(self, ctx: ChapterWriterContext) -> str:
+        return self._field(
+            ctx,
+            "tech_name",
+            self.submission_field(ctx, "project_name", "本项目"),
+        )
+
+    def _trl(self, ctx: ChapterWriterContext) -> str:
+        profile = ctx.get("profile") or {}
+        content = profile.get("content") or {}
+        return self._field(ctx, "trl_level", str(content.get("trl_hint") or "待验证"))
+
+    def _field(self, ctx: ChapterWriterContext, key: str, default: str = "") -> str:
+        value = self.analysis_field(ctx, key, default)
+        return self._clean(value) or default
+
+    def _items(self, ctx: ChapterWriterContext, key: str) -> list[str]:
+        analysis = (ctx.get("profile") or {}).get("analysis") or {}
+        raw = analysis.get(key)
+        if isinstance(raw, list):
+            return [self._clean(item) for item in raw if self._clean(item)]
+        text = self._clean(raw)
+        if not text:
+            return []
+        chunks = [p.strip(" ;；,，、") for p in text.replace("\n", "；").split("；")]
+        return [p for p in chunks if p]
+
+    @staticmethod
+    def _clean(value: Any) -> str:
+        if value is None:
+            return ""
+        text = str(value).strip()
+        return " ".join(text.split())
+
+    @staticmethod
+    def _gap_sentence(gaps: list[str]) -> str:
+        if not gaps:
+            return "尚需补充关键验证材料；未取得依据前，不应写入确定性的融资额、收入目标、客户案例或政策名称。"
+        return "；".join(gaps) + "；未取得依据前，不应写入确定性的融资额、收入目标、客户案例或政策名称。"

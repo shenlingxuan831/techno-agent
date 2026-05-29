@@ -137,6 +137,8 @@ Markdown 正文（及可选图表 JSON），写入 `bp_module_text` / `bp_module
 
 from __future__ import annotations
 
+from typing import Any
+
 from kt_workflow.services.chapter_writer_contract import ChapterWriterContext, ModuleChartSpec
 from kt_workflow.services.chapter_writers._base import BaseChapterWriter
 
@@ -161,9 +163,16 @@ class Chapter10Writer(BaseChapterWriter):
         mod = ctx["module"]
         module_id = mod.get("id", "")
 
-        # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch10_appx_A":
-        #     return self._write_bp_ch10_appx_A(ctx)
+        writers = {
+            "bp_ch10_appx_A": self._write_bp_ch10_appx_A,
+            "bp_ch10_appx_B": self._write_bp_ch10_appx_B,
+            "bp_ch10_appx_C": self._write_bp_ch10_appx_C,
+            "bp_ch10_appx_D": self._write_bp_ch10_appx_D,
+            "bp_ch10_appx_E": self._write_bp_ch10_appx_E,
+            "bp_ch10_appx_F": self._write_bp_ch10_appx_F,
+        }
+        if module_id in writers:
+            return writers[module_id](ctx)
 
         # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
@@ -183,3 +192,125 @@ class Chapter10Writer(BaseChapterWriter):
     #
     # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
     # ------------------------------------------------------------------
+
+    def _write_bp_ch10_appx_A(self, ctx: ChapterWriterContext) -> str:
+        """写 附录A 技术实验报告与测试数据。"""
+        rows = [
+            ["实验/测试报告", self._evidence(ctx, "trl_rationale", "TRL 或验证依据"), "待归档", "支撑技术成熟度、性能指标和可行性结论"],
+            ["关键参数与检测数据", self._evidence(ctx, "innovation_detail", "创新性或参数说明"), "待核验", "支撑核心技术、竞品对比和风险判断"],
+            ["中试/试点记录", self._excerpt_hint(ctx, ["中试", "试点", "测试", "验证"]), "待补充", "支撑商业化落地路径"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["实验数据", "测试报告", "中试", "试点"]))
+
+    def _write_bp_ch10_appx_B(self, ctx: ChapterWriterContext) -> str:
+        """写 附录B 知识产权证书。"""
+        rows = [
+            ["专利/软著/论文清单", self._evidence(ctx, "ip_status", "知识产权状态"), "待核验", "支撑权属、保护范围和技术壁垒"],
+            ["权属与许可文件", "【待补充】需提供申请人/权利人、授权状态、许可边界。", "待补充", "避免后续转化中的权属争议"],
+            ["专利布局说明", self._evidence(ctx, "advantages", "技术优势"), "待完善", "连接核心优势与知识产权保护策略"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["知识产权", "专利", "软著", "权属"]))
+
+    def _write_bp_ch10_appx_C(self, ctx: ChapterWriterContext) -> str:
+        """写 附录C 团队成员履历与资质证明。"""
+        rows = [
+            ["核心成员履历", self._evidence(ctx, "team_and_resources", "团队与资源"), "待核验", "支撑研发能力、交付能力和组织规划"],
+            ["顾问/合作单位资质", self._excerpt_hint(ctx, ["团队", "导师", "实验室", "合作单位", "资质"]), "待补充", "支撑外部资源和转化网络"],
+            ["设备与平台证明", self._evidence(ctx, "team_and_resources", "团队与资源"), "待完善", "支撑研发验证和持续迭代能力"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["团队", "履历", "资质", "实验室"]))
+
+    def _write_bp_ch10_appx_D(self, ctx: ChapterWriterContext) -> str:
+        """写 附录D 市场调研与行业报告。"""
+        rows = [
+            ["目标市场资料", self._evidence(ctx, "target_market", "目标市场"), "待核验", "支撑市场规模、客户画像和切入场景"],
+            ["竞品/替代方案资料", self._evidence(ctx, "competitive_landscape", "竞争格局"), "待补充", "支撑竞争分析和差异化定位"],
+            ["政策与产业方向资料", self._evidence(ctx, "policy_fit_hint", "政策方向"), "待补充", "支撑政策适配和申报路径"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["市场", "行业报告", "竞品", "政策"]))
+
+    def _write_bp_ch10_appx_E(self, ctx: ChapterWriterContext) -> str:
+        """写 附录E 合作意向书与协议模板。"""
+        rows = [
+            ["合作意向书", self._excerpt_hint(ctx, ["合作", "意向", "客户", "企业", "试点"]), "待补充", "支撑需求真实性和场景落地"],
+            ["试点/联合验证协议模板", "【待补充】建议列明验证目标、数据归属、保密义务和成果使用边界。", "待补充", "降低试点推进中的合规和交付风险"],
+            ["转化/许可协议要点", self._evidence(ctx, "ip_status", "知识产权状态"), "待完善", "支撑收益分配、权利许可和后续商业合作"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["合作", "意向书", "协议", "客户"]))
+
+    def _write_bp_ch10_appx_F(self, ctx: ChapterWriterContext) -> str:
+        """写 附录F 财务测算明细与假设依据。"""
+        gaps = self._items(ctx, "data_gaps")
+        rows = [
+            ["成本测算底表", "【待验证】需拆分研发、人力、设备、试点、认证、市场拓展等成本项。", "待补充", "支撑第七章成本与现金流"],
+            ["收入与定价假设", "【待验证】需提供产品/服务形态、定价口径、销量或项目数量假设。", "待补充", "支撑盈利模式和回本周期"],
+            ["融资与资金用途", "【待验证】未取得依据前不写具体融资额和承诺回报。", "待补充", "支撑资源需求与阶段性计划"],
+            ["缺失数据清单", "；".join(gaps[:4]) if gaps else "【待验证】财务相关输入尚未形成结构化材料。", "待完善", "作为后续尽调和访谈问题清单"],
+        ]
+        return self._appendix(ctx, rows, self._gap_note(ctx, ["财务", "成本", "收入", "融资", "预算"]))
+
+    def _appendix(self, ctx: ChapterWriterContext, rows: list[list[str]], note: str) -> str:
+        heading = self.module_heading(ctx)
+        table = self._markdown_table(["材料条目", "当前可用依据", "状态", "在 BP 中的用途"], rows)
+        return (
+            f"{heading}\n\n"
+            f"本附录用于归档正文引用但不适合展开叙述的支撑材料。当前版本先形成索引清单，正式提交前应由项目团队补齐原件、编号、日期和来源说明。\n\n"
+            f"{table}\n\n"
+            f"> {note}\n"
+        )
+
+    def _evidence(self, ctx: ChapterWriterContext, key: str, label: str) -> str:
+        value = self._field(ctx, key)
+        if value:
+            return f"【事实/待核验】{value}"
+        return f"【待补充】analysis.{key} 暂无{label}，需回到原始材料或访谈中补证。"
+
+    def _excerpt_hint(self, ctx: ChapterWriterContext, keywords: list[str]) -> str:
+        text = self._clean(ctx.get("extracted_text"))
+        if not text:
+            return "【待补充】未读取到可用于附录摘录的原文片段。"
+        for kw in keywords:
+            pos = text.find(kw)
+            if pos >= 0:
+                start = max(0, pos - 45)
+                end = min(len(text), pos + 95)
+                snippet = self._clean(text[start:end])
+                return f"【事实/待核验】原文片段：{snippet}"
+        return "【待补充】原文中未自动定位到明确线索，需人工补充材料编号和来源。"
+
+    def _gap_note(self, ctx: ChapterWriterContext, keywords: list[str]) -> str:
+        gaps = [g for g in self._items(ctx, "data_gaps") if any(k in g for k in keywords)]
+        if gaps:
+            return "【待验证】与本附录相关的缺失项：" + "；".join(gaps[:4]) + "。"
+        return "【待验证】如未提供原件或可复核来源，本附录仅作为待补材料索引，不应替代正式证明文件。"
+
+    def _field(self, ctx: ChapterWriterContext, key: str, default: str = "") -> str:
+        return self._clean(self.analysis_field(ctx, key, default))
+
+    def _items(self, ctx: ChapterWriterContext, key: str) -> list[str]:
+        analysis = (ctx.get("profile") or {}).get("analysis") or {}
+        raw = analysis.get(key)
+        if isinstance(raw, list):
+            return [self._clean(item) for item in raw if self._clean(item)]
+        text = self._clean(raw)
+        if not text:
+            return []
+        chunks = [p.strip(" ;；,，、") for p in text.replace("\n", "；").split("；")]
+        return [p for p in chunks if p]
+
+    @staticmethod
+    def _markdown_table(columns: list[str], rows: list[list[str]]) -> str:
+        header = "| " + " | ".join(columns) + " |"
+        sep = "| " + " | ".join(["---"] * len(columns)) + " |"
+        body = []
+        for row in rows:
+            escaped = [str(cell).replace("|", "｜").replace("\n", "<br>") for cell in row]
+            body.append("| " + " | ".join(escaped) + " |")
+        return "\n".join([header, sep] + body)
+
+    @staticmethod
+    def _clean(value: Any) -> str:
+        if value is None:
+            return ""
+        text = str(value).strip()
+        return " ".join(text.split())
