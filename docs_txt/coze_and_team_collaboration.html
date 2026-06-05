@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>在 Coze 与 Cursor 之间协作、模型配置与分工说明</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+<div class="nav"><a href="index.html">← 返回文档索引</a></div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">在 Coze 与 Cursor 之间协作、模型配置与分工说明</h1>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">本文回答三件事：<strong style="font-weight:bold;">别人主要在 Coze 上改/跑时怎么少踩坑</strong>、<strong style="font-weight:bold;">大模型要不要配</strong>、<strong style="font-weight:bold;">组员怎么分工</strong>（要不要 HTTP 接口）。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">1. 让仓库在 Coze 上也「好处理」</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">核心原则是：<strong style="font-weight:bold;">仓库根目录 = 工作区根</strong>，与本地一致。</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">约定</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">说明</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">COZE_WORKSPACE_PATH</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">在 Coze 云开发 / 沙箱里一般会自动指向项目根；本地请显式设为仓库根（与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_setup.html</code> 一致）。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">相对路径</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">payloads/payload_kt_workflow.json</code> 里的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">source_uri</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/*.json</code>、注册表 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code> 都相对仓库根解析；<strong style="font-weight:bold;">不要假设</strong>只有 Cursor 才有某盘符路径。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">Loop 追踪</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">本地不想连 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">api.coze.cn</code> 上报时，在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.env</code> 设 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">SLX_LOCAL_NO_COZE_LOOP=1</code>（见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">env.example</code>）。Coze 线上保持默认即可。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">依赖</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">requirements-windows.txt</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">pyproject.toml</code> 保持一致；组员改依赖后要更新锁文件或 requirements，避免「我这里能跑」现象。</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">Cursor 与 Coze 的分工建议</strong>：业务逻辑、节点、注册表脚本在 Git 里协作；Secrets（API Key）只放在各环境变量 / Coze 密钥管理里，不要提交。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">2. 大模型：还要不要配置？能不能直接跑？</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">要分 <strong style="font-weight:bold;">哪条流程</strong>：</p>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">-m kt</code> / 模块化科技成果转化流水线）</h3>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">上游</strong>（ingest → extract → <strong style="font-weight:bold;">analyze</strong> → structure）已接 <strong style="font-weight:bold;">DeepSeek 纯文本分析</strong>，产物写入 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">llm_source_analysis</code> 与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structured_profile</code> v3。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">中游</strong>各章节点当前仍为<strong style="font-weight:bold;">桩</strong>；组员按 <a href="kt_workflow_chapter_writer_guide.html">kt_workflow_chapter_writer_guide.html</a> 接入真实生成。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">联调图与库、暂不调用 analyze 时可设 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KT_ANALYSIS_MOCK_LLM=1</code>（见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">env.example</code>）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">DeepSeek：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">DEEPSEEK_API_KEY</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">DEEPSEEK_BASE_URL</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">DEEPSEEK_MODEL</code>。</li>
+</ul>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">其它图（主 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">flow</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_simple</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp</code>、各分析节点等）</h3>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">默认会通过 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">coze_coding_dev_sdk.LLMClient</code> 调模型，需要 <strong style="font-weight:bold;">方舟 / OpenAI 兼容</strong> 的 Key 与 Base URL（见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">env.example</code>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">ARK_API_KEY</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">OPENAI_BASE_URL</code> 等）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">若暂时无 Key，<strong style="font-weight:bold;">简版 BP</strong> 可设 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">BP_SIMPLE_MOCK_LLM=1</code> 走占位输出（见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">env.example</code> 注释）。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">3. 组员分工协作：需要协议 / 接口吗？</h2>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">必须用 Git 对齐的「契约」</h3>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">入参 JSON</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow</code> 与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KTWorkflowInput</code> 一致，字段见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/state.py</code>（如 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">project_name</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">source_uri</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">user_type</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">contact_info</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">specific_requirements</code>）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">上游写库标准</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_contracts.html</code> + <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_analysis_output_schema.json</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">中游生成标准</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_chapter_writer_guide.html</code> + <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_chapter_chart_spec_schema.json</code> + <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">services/chapter_writer_contract.py</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">细粒度小节 id</strong>：以 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code> 为准；<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code> 的 <strong style="font-weight:bold;">slug = 模块 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code></strong>，改大纲要动生成脚本并约定同步。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">数据库</strong>：不设 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KT_WORKFLOW_DATABASE_URL</code> 时，每次运行单独 SQLite：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/databases/&lt;run_id&gt;.sqlite</code>（目录已 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.gitignore</code>）。团队共享跑数则用 Postgres 连接串。</li>
+</ul>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">HTTP 接口（给 Coze 工作流 / 其它服务调）</h3>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">服务启动后（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">python src/main.py -m http -p 5000</code>，且 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">PYTHONPATH</code> 含 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src</code>）：</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">路径</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">用途</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run_kt_workflow</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">与 CLI <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">python ... -m kt --json-file ...</code> 相同逻辑，Body 为 JSON，与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">payloads/payload_kt_workflow.json</code> 同形。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run_bp_simple</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">简版 BP。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">主 LangGraph 流程。</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">可选请求头：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">x-run-id</code>（与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">/run</code> 一致，便于追踪；见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">main.py</code> 中 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">HEADER_X_RUN_ID</code>）。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">不强制</strong>人人都写 HTTP：本地 CLI <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">-m kt</code> 与 CI 脚本即可；<strong style="font-weight:bold;">需要</strong> Coze 画布里的「HTTP 请求」节点或外部回调时，用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run_kt_workflow</code> 最直接。</p>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">建议的模块分工（示例）</h3>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">上游 A</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">extract</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analyze</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structure</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">source_extract</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">source_analyzer</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">profile_builder</code>）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">中游 B～K</strong>：按 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter</code> 0～10 认领，实现 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">services/chapter_writers/chapter_XX.py</code>（见章节写手指南）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">大纲 C</strong>：维护 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code>（id 已冻结，小改 writer_hint 可 PR）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">下游 D</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">aggregate</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">polish</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">pdf</code>（当前阶段可后置）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">联调 E</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">main.py</code> HTTP、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.env</code> 示例、文档索引。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">相关文档</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">数据库与环境：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_setup.html</code></li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">代码框架白话说明：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_framework.html</code></li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">上游契约</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_contracts.html</code></li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">中游章节生成</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_chapter_writer_guide.html</code></li>
+</ul>
+</div>
+
+</body>
+</html>

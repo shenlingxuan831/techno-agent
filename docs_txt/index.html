@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>文档索引 — 科技成果转化智能体</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:4.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">文档索引</h1>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">文档</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">用途</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">REPOSITORY_LAYOUT.md（见仓库根目录，未收录在本文件夹）</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">仓库目录说明（源码与配置分层）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="bp_research_commercialization_outline.html">bp_research_commercialization_outline.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">科研商业化 BP 纲领（原则、目录、字数、编审）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="bp_research_commercialization_templates.html">bp_research_commercialization_templates.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">话术与表格骨架</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="kt_workflow_contracts.html">kt_workflow_contracts.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">上游契约</strong>：流水线、artifact、profile v3、analyze</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="kt_workflow_chapter_writer_guide.html">kt_workflow_chapter_writer_guide.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">中游必读</strong>：按章生成、读库/写库、接口、分章字段映射</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="kt_workflow_framework.html">kt_workflow_framework.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">kt_workflow 代码框架（直白版）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="kt_workflow_setup.html">kt_workflow_setup.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">数据库、环境变量、本地运行</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><a href="coze_and_team_collaboration.html">coze_and_team_collaboration.html</a></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">Coze/Cursor 协作与 HTTP</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">配置 schema（协作标准）</strong></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">文件</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">说明</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">62 模块 id / chapter / writer_hint</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_analysis_output_schema.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">llm_source_analysis</code> 字段</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_source_analysis_llm_cfg.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">DeepSeek 分析 prompt</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_chapter_chart_spec_schema.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code> JSON</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">示例请求体：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">payloads/</code>。</p>
+</div>
+
+<div class="toolbar" style="margin-top:24px;">
+  <span class="hint"><strong>发给组员：</strong>打包整个 docs_txt 文件夹；双击 index.html 打开。
+  仓库：<a href="https://github.com/shenlingxuan831/techno-agent.git">techno-agent</a>，分支 feature-Xiao。</span>
+</div>
+
+</body>
+</html>

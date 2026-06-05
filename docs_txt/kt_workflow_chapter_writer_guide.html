@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>中游章节生成指南（组员必读）</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+<div class="nav"><a href="index.html">← 返回文档索引</a></div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:4.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">中游章节生成指南（组员必读）</h1>
+<div class="blockquote" style="margin-top:4.0pt;margin-bottom:4.0pt;padding:4pt 10pt;border-left:3pt solid #0066CC;background:#F7F9FC;mso-border-left-alt:solid #0066CC 3.0pt;">
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">你负责什么</strong>：把 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_chapter_00</code> … <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_chapter_10</code> 里的<strong style="font-weight:bold;">桩文字</strong>换成真实 BP 正文（及图表）。<br/>
+<strong style="font-weight:bold;">你不负责什么</strong>：解析用户上传文件、跑总分析（上游已写入 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structured_profile</code>）。<br/>
+<strong style="font-weight:bold;">必读配套</strong>：纲领 <a href="bp_research_commercialization_outline.html">bp_research_commercialization_outline.html</a>、话术 <a href="bp_research_commercialization_templates.html">bp_research_commercialization_templates.html</a>、契约 <a href="kt_workflow_contracts.html">kt_workflow_contracts.html</a>。</p>
+</div>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">1. 五句话上手</h2>
+<ol style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">每个 BP 小节在注册表里有一个 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code></strong>（如 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch3_3_1</code>），就是你写库的 <strong style="font-weight:bold;">slug</strong>。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">生成前先读 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structured_profile</code></strong>（JSON），重点用 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis</code></strong> 和 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.excerpt</code></strong>。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">写出的 Markdown 存 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code></strong>；要配图的模块再存 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code></strong>（slug 相同）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">字数、表格要求看注册表 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">writer_hint</code></strong> 和纲领里的字数表。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">没有依据的数据标 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【待验证】</code></strong>，不要编造专利号、金额、客户名。</li>
+</ol>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">2. 从数据库读什么</h2>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:2.0pt;margin-left:0;margin-right:0;">2.1 主入口：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structured_profile</code></h3>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-python">import json
+from kt_workflow import constants as C
+from kt_workflow.repositories import artifacts as art_repo
+
+raw = art_repo.get_latest_text(session, run_id, C.STRUCTURED_PROFILE, "default")
+profile = json.loads(raw)
+</code></pre>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">路径</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">写章节时怎么用</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">submission.project_name</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">成果/项目名</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">submission.user_type</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">政府评审 / 投资机构 / 合作企业 → 影响语气与 0.2 矩阵</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">submission.specific_requirements</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">用户补充要求</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.excerpt</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">材料摘录（prompt 上下文）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.keywords_top</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">关键词</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.trl_hint</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">TRL 提示</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis.*</code></strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">大模型分析结果（各章主要依据）</strong></td>
+</tr>
+
+</table>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">2.2 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis</code> 字段一览</h3>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">与 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_analysis_output_schema.json</code> 一致：</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">字段</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">含义</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">summary</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">成果概述</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">tech_name</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">技术/成果名称</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">trl_level</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">trl_rationale</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">成熟度及依据</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">tech_innovation</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">innovation_detail</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">创新性</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">advantages</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">disadvantages</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">优劣势列表</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">application_scenarios</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">应用场景</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">target_market</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">目标市场</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">competitive_landscape</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">竞争格局</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">ip_status</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">知识产权</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">team_and_resources</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">团队与资源</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">commercialization_barriers</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">产业化障碍</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">policy_fit_hint</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">政策方向</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">keywords</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">关键词</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data_gaps</code></strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">材料缺什么 → 正文里标【待验证】并列出</strong></td>
+</tr>
+
+</table>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">2.3 可选：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">extracted_text</code></h3>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">仅当 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.excerpt</code> 不够、需要引用原文细节时再读。不要重复实现文件解析。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">3. 往数据库写什么</h2>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">3.1 正文 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code></h3>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">artifact_type</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code> </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">slug</strong>：注册表 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">modules[].id</code></strong>（如 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_2</code>）  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">content_text</strong>：该小节 Markdown  </li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">正文格式约定</strong></p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-markdown">## {ref} {title}
+
+（正文段落…）
+
+| 列1 | 列2 |
+|-----|-----|
+| …   | …   |
+
+&gt; 【事实】/【推断】/【待验证】…
+</code></pre>
+<ul style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">第一行必须是 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">## {ref} {title}</code>，与注册表一致，便于 aggregate 拼接。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">数据标注：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【事实】</code> 有材料依据；<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【推断】</code> 合理推论；<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【待验证】</code> 缺材料（可引用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis.data_gaps</code>）。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">写入代码（统一入口）</strong></p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-python">from kt_workflow.repositories import bp_modules
+
+bp_modules.write_module_text(session, run_id, mod, markdown_text)
+</code></pre>
+<h3 style="font-size:13.0pt;font-weight:bold;margin-top:4.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;">3.2 图表 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code></h3>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">当注册表 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">needs_chart: true</code></strong> 时必须写入。</p>
+<ul style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">slug</strong>：与正文 <strong style="font-weight:bold;">相同</strong> 的模块 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code> </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">content_text</strong>：JSON 字符串，结构见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_chapter_chart_spec_schema.json</code></li>
+</ul>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-json">{
+  "schema_version": 1,
+  "chart_type": "table",
+  "title": "技术参数对比",
+  "spec": {
+    "columns": ["指标", "本项目", "行业标准", "备注"],
+    "rows": [["精度", "±0.1%", "±0.5%", "【待验证】"]]
+  }
+}
+</code></pre>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chart_type</code> 取值：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">table</code> | <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">mermaid</code> | <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">image_ref</code> | <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">placeholder</code>（仅开发桩）。</p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-python">bp_modules.write_module_chart_stub(session, run_id, mod["id"], mod["ref"], spec=chart_dict)
+</code></pre>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">4. 共用代码接口（必须遵守）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">类型定义：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/services/chapter_writer_contract.py</code></p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-python">class ChapterWriterContext(TypedDict, total=False):
+    run_id: str
+    profile: StructuredProfile      # structured_profile 解析后的 dict
+    extracted_text: str | None
+    module: BpModuleSpec            # 注册表当前模块
+    document_title: str
+
+def generate_module_text(ctx: ChapterWriterContext) -&gt; str:
+    """返回该模块完整 Markdown（含 ## 标题）。"""
+
+def generate_module_chart(ctx: ChapterWriterContext) -&gt; ModuleChartSpec | None:
+    """needs_chart 时返回 chart spec dict；否则 None。"""
+</code></pre>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">实现位置（已建脚手架）</strong></p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code>src/kt_workflow/services/chapter_writers/
+  __init__.py          # get_chapter_writer(chapter)
+  _base.py             # BaseChapterWriter 基类与工具
+  chapter_00.py … chapter_10.py   # 【组员改这里】每章一个文件
+</code></pre>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter_runner.py</code> 已接入：读 profile → 调 writer → 写库。<strong style="font-weight:bold;">一般不要改</strong> <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">nodes/chapters/node_chapter_XX.py</code>。</p>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-python">for mod in modules_for_chapter(chapter):
+    ctx = build_context(session, state, mod)
+    text = chapter_writer.generate_module_text(ctx)
+    bp_modules.write_module_text(session, state.run_id, mod, text)
+    if mod.get("needs_chart"):
+        chart = chapter_writer.generate_module_chart(ctx)
+        if chart:
+            bp_modules.write_module_chart_stub(...)
+</code></pre>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">每人只改自己章的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter_XX.py</code>，<strong style="font-weight:bold;">入参/出参不变</strong>。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">5. 各章读哪些 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis</code> 字段（对照 BP 模板）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">按纲领与模板，生成时 <strong style="font-weight:bold;">优先用下表字段</strong>；没有的从 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">content.excerpt</code> 找，仍无则 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【待验证】</code> + 写入时参考 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data_gaps</code>。</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">chapter</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">注册表范围</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">主要读的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis</code> 字段</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">模板要点</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">0</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">0.1～0.3</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">submission.user_type</code>；证据规则见模板 0.3</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">保密/版本/阅读矩阵</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">1</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">1.1～1.6 执行摘要六块</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">summary</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">tech_name</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">target_market</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">advantages</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">competitive_landscape</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">disadvantages</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">application_scenarios</code>；财务常缺 → <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data_gaps</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">总字数 <strong style="font-weight:bold;">800～1200</strong>；六块各见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">writer_hint</code></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">2</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">2.1～2.4</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">summary</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">trl_level</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">trl_rationale</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">application_scenarios</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">team_and_resources</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">2.1/2.2 各 ≤300 字</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">3</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.1～3.6</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">innovation_detail</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">advantages</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">ip_status</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">disadvantages</code>；3.6 偏技术机理</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">整章 ≤2000 字；3.3/3.4/3.5 需表</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">4</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">4.1～4.6</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">target_market</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">competitive_landscape</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">application_scenarios</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">policy_fit_hint</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">整章 ≤2000 字；4.2 TAM/SAM/SOM 表</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">5</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">5.1.1～5.5.1</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">application_scenarios</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">target_market</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">commercialization_barriers</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">5.1 合计 600～800 字</strong>（四子模块注意总预算）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">6</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">6.1～6.5</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">team_and_resources</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">ip_status</code>；<strong style="font-weight:bold;">6.4 偏专利布局</strong>，与 3.6 错开</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">整章 ≤800 字</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">7</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">7.1～7.6</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">多为 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data_gaps</code>；无则全章【待验证】+ 假设表</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">成本/收入/现金流表结构见模板</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">8</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">8.1～8.5</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">disadvantages</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">commercialization_barriers</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">8.5 风险矩阵表</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">9</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">9.1～9.3</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">summary</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">advantages</code>, <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data_gaps</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">9.1/9.2/9.3 字数见纲领</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">10</strong></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">附录 A～F</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">extracted_text</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis</code> 中可附录化的事实</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">清单式，无硬字数上限</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">阅读对象矩阵（0.2）</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">submission.user_type</code> 或后续扩展的读者类型决定哪些「可选章」要生成；必选章始终生成。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">6. 模块 id 与执行摘要六块（已冻结）</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">id</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">标题</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">writer_hint 摘要</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_1</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">一句话介绍</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">≤50 字话术模板</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_2</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">市场机会</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">行业、规模、CAGR、TAM/SAM/SOM</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_3</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">核心优势</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">≤3 点，量化对比</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_4</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">商业模式</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">盈利、定价、渠道</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_5</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">财务要点</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">融资、用途、回本（缺则【待验证】）</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_ch1_1_6</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">风险与结论</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">1 风险 + 措施 + 可行/谨慎/不可行</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">完整 62 模块：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code>。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">7. 认领与提交流程</h2>
+<ol style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">认领</strong>：在组内登记 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter</code> 数字（0～10）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">开发</strong>：实现 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">services/chapter_writers/chapter_XX.py</code> + 必要时改 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">node_chapter_XX.py</code> 一行调用。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">自测</strong>：跑完 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">-m kt</code> 后打开 SQLite，检查你章所有 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code> 的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code> 非桩、chart 符合 schema。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">合入</strong>：不改 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">profile</code> 根键、不改他人章 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code>、不改上游 extract/analyze 契约。</li>
+</ol>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">PR 检查清单</strong></p>
+<ul style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">[ ] slug 与注册表 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code> 一致  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">[ ] 含 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">## {ref} {title}</code> 标题行  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">[ ] 遵守 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">writer_hint</code> 字数  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">[ ] 无依据数据标【待验证】  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">[ ] <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">needs_chart</code> 模块有合法 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code> JSON  </li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">8. 常见问题</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">Q：材料里没写财务，第 7 章怎么写？</strong><br/>
+A：用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">analysis.data_gaps</code> 驱动【待验证】，输出空表骨架 + 假设说明，不要编具体金额。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">Q：3.6 和 6.4 都有「技术壁垒」？</strong><br/>
+A：3.6 写机理与 know-how；6.4 写专利组合与 IP 运营。见纲领编审提示。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">Q：5.1 四个子模块各写一段，字数爆了？</strong><br/>
+A：纲领要求 5.1 <strong style="font-weight:bold;">合计</strong> 600～800 字；建议在 chapter_5 内做 shared budget 或合并 prompt。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">Q：能否直接读用户 PDF？</strong><br/>
+A：不能。上游 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">extracted_text</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">structured_profile</code> 已是标准入口。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">9. 相关文件</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">文件</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">用途</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">模块 id、chapter、writer_hint</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_chapter_chart_spec_schema.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">图表 JSON</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/kt_analysis_output_schema.json</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">上游 analysis 字段</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">services/chapter_writer_contract.py</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">Python 接口类型</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">repositories/bp_modules.py</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">写库函数</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">nodes/chapters/chapter_runner.py</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">按章循环（待接入你的 writer）</td>
+</tr>
+
+</table>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">10. 变更记录</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">日期</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">变更</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">2026-05-20</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">初版：中游读写字段、接口、分章映射、图表 schema</td>
+</tr>
+
+</table>
+</div>
+
+</body>
+</html>

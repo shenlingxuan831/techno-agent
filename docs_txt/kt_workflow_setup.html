@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>kt_workflow 数据库与运行说明</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+<div class="nav"><a href="index.html">← 返回文档索引</a></div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">kt_workflow 数据库与运行说明</h1>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">本模块使用 <strong style="font-weight:bold;">独立</strong> 于 Coze 托管 PostgreSQL 的连接串，便于本地 SQLite 与生产 Postgres 切换。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">契约（输入、artifact、分层）</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_contracts.html</code>。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">环境变量</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">变量</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">说明</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KT_WORKFLOW_DATABASE_URL</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选。不设则每次运行使用 <strong style="font-weight:bold;">独立</strong> SQLite：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/databases/&lt;run_id&gt;.sqlite</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">run_id</code> 与请求上下文一致）。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KT_WORKFLOW_SQL_ECHO</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">设为 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">1</code> 可打印 SQL（调试）。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">COZE_WORKSPACE_PATH</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">建议设为仓库根；影响 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">source_uri</code> 相对路径解析（读入材料）。</td>
+</tr>
+
+</table>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">BP 文档与注册表</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">人文标准：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_research_commercialization_outline.html</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_research_commercialization_templates.html</code>；模块清单 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">registry_version</code>）。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">本地运行目录（默认已 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.gitignore</code>）</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">路径</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">内容</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/databases/</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">每次运行的 SQLite：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">{run_id}.sqlite</code>；未绑定 run 的兜底为 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow.sqlite3</code>（如直接 import 调 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">session_scope</code>）。</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/runs/&lt;run_id&gt;/</code></td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">该次导出的 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_preview.html</code></strong>（浏览器预览）、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_preview_source.md</code> 等。</td>
+</tr>
+
+</table>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">本地 SQLite（默认）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">无需安装 PostgreSQL。每次执行 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">-m kt</code>（或 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run_kt_workflow</code>）会在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">databases/</code> 下新建对应 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">run_id</code> 的库文件并 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">create_all</code>。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">旧版路径 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">data/kt_workflow.db</code> 已不再使用，可手工删除。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">生产 PostgreSQL</h2>
+<ol style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">创建空库，例如 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.env</code> 中设置（示例）：</li>
+</ol>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">env
+   KT_WORKFLOW_DATABASE_URL=postgresql+psycopg2://用户:密码@主机:5432/kt_workflow</code></p>
+<ol start="3" style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">首次运行同样会 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">create_all</code>。<strong style="font-weight:bold;">团队规模变大后</strong>建议引入 Alembic 迁移（本框架未强制）。</li>
+</ol>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">运行示例</h2>
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:9.5pt;background:#F6F8FA;border:0.75pt solid #CCCCCC;padding:6pt;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;margin-top:3.0pt;margin-bottom:3.0pt;"><code class="language-powershell">cd &lt;仓库根&gt;
+$env:COZE_WORKSPACE_PATH = (Get-Location).Path
+$env:PYTHONPATH = "$(Get-Location)\src"
+.\.venv\Scripts\python.exe src\main.py -m kt --json-file payloads/payload_kt_workflow.json
+</code></pre>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">HTTP 与 CLI 等价：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">POST /run_kt_workflow</code>（Body 与上表 JSON 相同）。协作与环境变量说明见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">coze_and_team_collaboration.html</code>。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">扩展节点</h2>
+<ol style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/nodes/</code> 新增 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">node_xxx.py</code>，实现 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_xxx_node(state, config, runtime) -&gt; dict</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">repositories/artifacts.py</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">runs.py</code> 读写库，勿在节点里散写 SQL。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">修改 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/graph.py</code> 的边；同步更新 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">registry.py</code> 中的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">PIPELINE_NODE_IDS</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">BP 细粒度小节以 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code> 为准；话术与字数见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_research_commercialization_outline.html</code>；整体流程见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_framework.html</code>。</li>
+</ol>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">表概览</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_projects</code>：项目/案件</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_runs</code>：一次运行实例</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_artifacts</code>：版本化产物（文本、JSON、后续 chart/pdf 的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">storage_uri</code>）</li>
+</ul>
+</div>
+
+</body>
+</html>

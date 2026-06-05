@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>科研成果商业化 BP — 话术与表格模板（团队定稿）</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+<div class="nav"><a href="index.html">← 返回文档索引</a></div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:4.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">科研成果商业化 BP — 话术与表格模板（团队定稿）</h1>
+<div class="blockquote" style="margin-top:4.0pt;margin-bottom:4.0pt;padding:4pt 10pt;border-left:3pt solid #0066CC;background:#F7F9FC;mso-border-left-alt:solid #0066CC 3.0pt;">
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">纲领与字数：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_research_commercialization_outline.html</code><br/>
+模块 id / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">writer_hint</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">needs_chart</code>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code></p>
+</div>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">下文为撰写时可复制的<strong style="font-weight:bold;">结构、话术与表格骨架</strong>；与纲领冲突时以纲领与注册表为准。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">0.1 保密级别、版本号、更新日期</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">保密级别</strong>（封面顶部居中）<br/>
+- 公开 / 内部 / 机密 / 绝密（与访问权限一致；机密、绝密需协议与审批说明）。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">版本号</strong>（保密等级下一行）<br/>
+- 格式：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">V主版本.次版本.修订号</code>（如 V1.2.1）。<br/>
+- <strong style="font-weight:bold;">主版本+1</strong>：整体架构、核心分析模型、一级标题逻辑重大调整。<br/>
+- <strong style="font-weight:bold;">次版本+1</strong>：二级/三级标题内容边界、字数限制、图表数量优化且不改整体框架。<br/>
+- <strong style="font-weight:bold;">修订号+1</strong>：叙述结构、排版、数据来源优先级说明微调或错别字。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">更新日期</strong>（版本号下一行）<br/>
+- 格式：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">YYYY-MM-DD</code></p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">0.2 阅读对象与章节必选矩阵</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">阅读对象</strong>：政府评审 / 投资机构 / 合作企业 —— 生成前须识别，再决定章节取舍。</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">章节</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">政府评审</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">投资机构</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">合作企业</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">0. 文档说明</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">1. 执行摘要</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">2. 项目背景</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3. 核心技术</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">4. 市场分析</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">5. 商业化方案</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">6. 团队与组织</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">7. 财务规划</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">8. 风险分析</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">9. 结论展望</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">必选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">10. 附录</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">可选</td>
+</tr>
+
+</table>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">规则</strong>：必选必出；「可选」是否纳入由用户/上下文明示。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">0.3 数据标注与来源（≤200 字摘要区可用）</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">数据通过<strong style="font-weight:bold;">页脚引用来源</strong>注明。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">优先级</strong>：内部实测 &gt; 第三方报告 &gt; 学术文献 &gt; 行业估算（附录列来源清单）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">正文用语：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">【事实】/【推断】/【待验证】</code>。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">一、执行摘要（800～1200 字；总-分-总；无整节大图）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">须覆盖</strong>：项目一句话介绍；市场机会；核心优势；商业模式；财务要点；风险与结论。</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">子块</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">固定话术/边界</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">一句话介绍</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">「[成果名称] 通过 [核心技术] 解决 [痛点]，面向 [场景] 提供 [产品形态]。」≤50 字</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">市场机会</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">目标行业；[X]亿元规模、CAGR；TAM/SAM/SOM 若可知必写</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">核心优势</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">相比 [竞品]；量化对比；≤3 点</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">商业模式</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">盈利方式 1+2；定价；渠道；合作方类型</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">财务要点</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">本轮融资、用途、约第 N 年营收、回本周期</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">风险与结论</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">1 个关键风险 + 措施 + 可行/谨慎/不可行</td>
+</tr>
+
+</table>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">二、项目背景与概述</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">2.1 研发背景</strong>：来源、周期、团队（话术：「本项目源于[来源]…历时[X]年…」）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">2.2 成果现状</strong>：TRL、里程碑表（研发→验证→落地）、当前进展一句话。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">2.3 商业化定位</strong>：赛道、切入场景、价值主张（「通过[技术]实现[效果]」）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">2.4 发展愿景</strong>：短/中/长期量化目标 + 里程碑表；可配路线图、TRL 曲线。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">三、核心技术与科研成果（章合计 ≤2000 字）</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">小节</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">要点</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">必用/推荐</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.1 技术原理</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">通俗逻辑；A→B→C</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">推荐原理图</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.2 创新点 ×3</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">突破+痛点+不可替代</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">无</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.3 技术参数</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">与行标/竞品对比</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">参数对比表</strong></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.4 验证数据</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">实验室/小试/中试</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">验证数据汇总表</strong>；未测写「待测」</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.5 知识产权</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">类型/号/状态/权属</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><strong style="font-weight:bold;">IP 清单表</strong></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">3.6 技术壁垒</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">专利/工艺/人才</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">与 6.4 错开侧重</td>
+</tr>
+
+</table>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">四、市场分析（章合计 ≤2000 字）</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">4.1</strong>：PEST + 产业链；<strong style="font-weight:bold;">4.2</strong>：TAM/SAM/SOM 表+增速；<strong style="font-weight:bold;">4.3</strong>：客户画像表；<strong style="font-weight:bold;">4.4</strong>：痛点；<strong style="font-weight:bold;">4.5</strong>：波特五力+竞品表（可选雷达）；<strong style="font-weight:bold;">4.6</strong>：钻石模型+落地条件。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">（市场规模表字段、用户画像表字段、竞品表字段等长表—按团队已定稿 Word 或协作文档照抄即可；逻辑与字段名与纲领一致。）</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">五、商业化落地方案</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">5.1.1～5.1.4</strong>：产品介绍、2～3 场景、TRL、边界；<strong style="font-weight:bold;">整组 5.1 控 600～800 字</strong>。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">5.2 商业模式</strong>：<strong style="font-weight:bold;">以图为主</strong>（利益相关者 / 场景再现 / 虚实 / 营销形态四选一逻辑）。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">5.3.1～5.3.5</strong>：盈利模式—篇首概括图；渠道与回报、收费、成本、价值依据、回本测算。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">5.4 产业布局</strong>：人才=项目+资源；主/子业务图标化。  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">5.5.1</strong>：实施路径（研发→推广），可百分比；流程图。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">六、运营团队与组织规划（章合计 ≤800）</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">6.1 核心团队（履历表、数据化业绩）；6.2 顾问；<strong style="font-weight:bold;">6.3 资源优势</strong>（组图+页尾可复现数据源）；<strong style="font-weight:bold;">6.4</strong> 专利布局（侧重组织）；<strong style="font-weight:bold;">6.5</strong> 产品+用户双视角竞品。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">七、财务规划</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">7.1～7.6：成本、收入（可弱化）、利润、现金流、盈亏平衡、融资；<strong style="font-weight:bold;">必用</strong>年度成本表、3～5 年营收利润表、现金流表、融资用途表；推荐趋势图与敏感性图。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">八、风险分析与应对</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">8.1～8.4 各一类风险；<strong style="font-weight:bold;">8.5</strong> 风险矩阵（类型、概率、影响、等级、措施）。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">九、结论与展望</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">9.1 可行性；9.2 核心价值；9.3 展望（字数见纲领表）。</li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">十、附录 A～F</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">A 实验/测试数据  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">B 知识产权证书  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">C 履历与资质  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">D 市场调研与行业报告  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">E 意向书与协议模板  </li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">F 财务测算明细与假设  </li>
+</ul>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">附录：用户需提供信息清单</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">必须</strong>：成果名称/领域/用途；原理+3 创新点+3～5 参数；验证数据摘要；IP 数量与状态；1～2 名核心人选。<br/>
+<strong style="font-weight:bold;">可选</strong>：中试与竞品参数、目标行业与场景、资金区间、痛点与合作意向等。</p>
+<div style="border:none;border-top:0.75pt solid #CCCCCC;margin-top:5.0pt;margin-bottom:5.0pt;height:0;line-height:0;"/>
+<p style="margin-top:3.0pt;margin-bottom:2.0pt;line-height:1.35;"><em>若需恢复聊天中的逐字长模版（含全部 PEST/五力/钻石的全文示例段），建议由项目组导出定稿 Word/PDF 放入 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">assets/</code> 或知识库，本仓库以纲领+注册表为单一源码事实。</em></p>
+</div>
+
+</body>
+</html>

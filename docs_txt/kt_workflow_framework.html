@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<title>kt_workflow 代码框架（直白版）</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    background: #fff;
+  }
+  .toolbar {
+    background: #f0f4f8;
+    border: 1px solid #c5d3e0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+  }
+  .toolbar button {
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-size: 11pt;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  .toolbar button:hover { background: #0052a3; }
+  .toolbar .hint { color: #555; }
+  .nav { margin-bottom: 16px; font-size: 10pt; }
+  .nav a { color: #0066cc; }
+</style>
+<script>
+function copyDocForWord() {
+  var src = document.getElementById('doc-content');
+  if (!src) { alert('未找到正文区域'); return; }
+  var wrapper = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word">'
+    + '<head><meta charset="UTF-8"></head>'
+    + '<body style="' + src.getAttribute('data-body-style') + '">'
+    + src.innerHTML + '</body></html>';
+  var plain = src.innerText || src.textContent;
+  if (navigator.clipboard && window.ClipboardItem) {
+    var item = new ClipboardItem({
+      'text/html': new Blob([wrapper], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function () {
+      showCopyOk();
+    }).catch(function () { fallbackCopy(wrapper, plain); });
+  } else {
+    fallbackCopy(wrapper, plain);
+  }
+}
+function fallbackCopy(html, plain) {
+  var ta = document.createElement('textarea');
+  ta.value = plain;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyOk(); }
+  catch (e) { alert('复制失败，请手动拖选正文后 Ctrl+C'); }
+  document.body.removeChild(ta);
+}
+function showCopyOk() {
+  var btn = document.getElementById('copy-word-btn');
+  if (!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制，请到 Word 中 Ctrl+V';
+  btn.style.background = '#2e7d32';
+  setTimeout(function () {
+    btn.textContent = old;
+    btn.style.background = '#0066cc';
+  }, 2500);
+}
+</script>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="copy-word-btn" onclick="copyDocForWord()">复制正文到 Word</button>
+  <span class="hint">推荐：点按钮复制 → 打开 Word → Ctrl+V（保留源格式）。比 Ctrl+A 粘贴更稳。</span>
+</div>
+<div class="nav"><a href="index.html">← 返回文档索引</a></div>
+
+<div id="doc-content" data-body-style="font-family:&quot;Microsoft YaHei&quot;,&quot;PingFang SC&quot;,SimSun,Arial,sans-serif;font-size:11.0pt;line-height:1.35;color:#000000;">
+<h1 style="font-size:22.0pt;font-weight:bold;margin-top:8.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:1.5pt solid #333;padding-bottom:2pt;">kt_workflow 代码框架（直白版）</h1>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">这份文档用日常语言说明：<strong style="font-weight:bold;">科技成果转化 BP 流水线</strong>在代码里是怎么拆的、数据存在哪、最后怎么拼成一份长文稿。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">一句话</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">程序把「跑一趟任务」记在数据库里，每一步往库里<strong style="font-weight:bold;">追加</strong>一条产物；细粒度 BP 按<strong style="font-weight:bold;">大纲里的最小模块</strong>一块一块写进去，
+最后用<strong style="font-weight:bold;">汇总节点</strong>按固定顺序读出所有模块，合成一份完整 Markdown，再润色、导出。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">顶层：从哪里进入</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">入口在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/main.py</code> 的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">run_kt_workflow</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">-m kt</code> 会走到这里）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">图定义在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/graph.py</code>：节点一条线串起来，没有并行分叉。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">环境、数据库连接、怎么本地跑一次</strong>见 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_setup.html</code>（本文不重复环境细节）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">冻结契约</strong>（入参、artifact、profile schema）：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_workflow_contracts.html</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">读源文件</strong>：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/text_io.py</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">read_source_text</code>），供 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">services/source_extract</code> 与节点共用，避免循环导入。</li>
+</ul>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:3.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">图在干什么（节点顺序）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">当前顺序可以理解为：</p>
+<ol style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">收材料</strong> → <strong style="font-weight:bold;">抽文本</strong> → <strong style="font-weight:bold;">结构化画像</strong>（前三步把原始输入变成可引用的「库里的标准件」）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">第 0 章到第 10 章</strong>（共 11 个节点：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_chapter_00</code> … <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_chapter_10</code>）：每一章节点负责把<strong style="font-weight:bold;">该章在注册表里列出的所有最小模块</strong>各写一条正文（需要图的话再写一个图表占位）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">汇总</strong>：按注册表顺序把所有模块正文（和可选图表 JSON）拼成 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_full_draft</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">润色</strong>：在整篇草案上套一层语言/格式桩，得到 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_polished</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">导出 PDF</strong>（若已实现则是读润色稿或草案落盘）。</li>
+</ol>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">与节点名顺序一致的一份清单在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/registry.py</code> 的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">PIPELINE_NODE_IDS</code> 里，改图时可以对表检查有没有漏改。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">「最小模块」从哪来：注册表</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">文件：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">config/bp_transform_outline_registry.json</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">一般由脚本生成：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">scripts/build_bp_transform_registry.py</code>（改大纲结构时改脚本或 JSON，再运行生成）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">代码读取：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/outline_loader.py</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">load_registry</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">modules_for_chapter</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">all_modules_in_order</code>）。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">每条模块大致包含：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code>（稳定编号）、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter</code>（第几章）、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">ref</code>（如 1.2）、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">title</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">needs_chart</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">writer_hint</code>（可选）。</p>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><strong style="font-weight:bold;">重要约定</strong>：正文和图表在数据库里用<strong style="font-weight:bold;">同一个</strong> <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">slug</code>，等于模块的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code>，这样汇编时不会对错行。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">仓库里默认落盘（与 Git 隔离）</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">不设 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">KT_WORKFLOW_DATABASE_URL</code>、走 SQLite 时：</p>
+<ul style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/databases/&lt;run_id&gt;.sqlite</code>：与该次 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">Context.run_id</code> 对应的库文件（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bind_sqlite_run</code>）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/runs/&lt;run_id&gt;/</code>：如 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_preview.html</code></strong>（双击浏览器预览）、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_preview_source.md</code>。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">var/kt_workflow/</code> 整体在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">.gitignore</code> 中。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">数据存在哪：artifacts 思路</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">业务上把它想成「一次运行 = 一个文件夹，里面很多版本化文件」：</p>
+<ul style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">表名等在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bootstrap</code>/模型里；产物集中在 <strong style="font-weight:bold;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_artifacts</code></strong>（具体字段以代码为准）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">常用 <strong style="font-weight:bold;">artifact_type</strong>（字符串常量）在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/constants.py</code>，例如：</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code>：某一小节的 Markdown 正文，<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">slug</code> = 模块 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code>：与上一小节同 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">slug</code>，放图表 spec 或占位 JSON 文本。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_full_draft</code>：汇总后的整篇 Markdown（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">slug</code> 一般用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">default</code>）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_polished</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">pdf_export</code>：后处理结果。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">写入封装在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/repositories/</code>。<strong style="font-weight:bold;">按模块写正文</strong>的逻辑在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">repositories/bp_modules.py</code>（<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">write_module_text</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">write_module_chart_stub</code>、<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">get_*</code>）。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">章节节点：为什么有 13 个文件</h2>
+<ul style="margin-top:0;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">目录：<code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/nodes/chapters/</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">每个 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">node_chapter_XX.py</code> 只做一件事：调用 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter_runner.kt_chapter_runner(..., chapter=X)</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;"><strong style="font-weight:bold;">共享实现</strong>在 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter_runner.py</code>：遍历该章所有模块，写桩正文；若 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">needs_chart</code> 为真则再写一条图表占位。</li>
+</ul>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">这样拆文件是为了：<strong style="font-weight:bold;">以后要按章替换模型、限流、或人工审核</strong>，可以只动某一章的 Python 入口，而不改 runner 核心。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">汇总节点在做什么</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">src/kt_workflow/nodes/node_aggregate.py</code>：</p>
+<ol style="margin-top:1.0pt;margin-bottom:3.0pt;padding-left:22pt;line-height:1.35;">
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">按 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">all_modules_in_order()</code> 的顺序遍历每个模块 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code>。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">取该 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">id</code> 下最新的 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_text</code>；若有 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_module_chart</code>，在汇整稿里插一段注释 + JSON 代码块（便于后续替换成真图）。</li>
+<li style="margin-top:0;margin-bottom:0;line-height:1.35;">把整个字符串写入 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">bp_full_draft</code>。</li>
+</ol>
+<p style="margin-top:2.0pt;margin-bottom:2.0pt;line-height:1.35;">所以：<strong style="font-weight:bold;">最终文档顺序 = JSON 注册表里 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">modules</code> 数组顺序</strong>；若你要调整成书顺序，应改注册表生成逻辑，而不是在 aggregate 里手写顺序。</p>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:3.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">改流水线时建议动哪些文件</h2>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;mso-table-layout-alt:fixed;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt;width:100%;border:none;mso-border-alt:solid windowtext .5pt;;margin-top:3.0pt;margin-bottom:3.0pt;">
+
+<tr>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">目标</th>
+<th style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;background:#F2F2F2;mso-shading:windowtext;mso-pattern:gray-10 auto;font-weight:bold;vertical-align:top;">去哪改</th>
+</tr>
+
+
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">换节点顺序、加减节点</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">graph.py</code> + <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">registry.py</code></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">大纲增删小节、改模块 id</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">scripts/build_bp_transform_registry.py</code> 或 JSON，然后重跑脚本</td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">某一章生成策略（只这一章用不同 prompt）</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">对应 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">nodes/chapters/node_chapter_XX.py</code> 或扩展 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">chapter_runner</code></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">汇总格式（章节标题、图表占位语法）</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">node_aggregate.py</code></td>
+</tr>
+<tr>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;">artifact 类型名</td>
+<td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext 1.0pt;padding:4.0pt 6.0pt;vertical-align:top;"><code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">constants.py</code> + 所有 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">write_artifact</code> / <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">get_latest</code> 调用处</td>
+</tr>
+
+</table>
+<h2 style="font-size:16.0pt;font-weight:bold;margin-top:6.0pt;margin-bottom:1.0pt;margin-left:0;margin-right:0;border-bottom:0.75pt solid #999;padding-bottom:2pt;">和「旧版四并行节点」的关系</h2>
+<p style="margin-top:0;margin-bottom:2.0pt;line-height:1.35;">早期示例是「执行摘要 / 市场 / 图表 / 计算」四个节点并行再汇总；当前主线已改为<strong style="font-weight:bold;">按大纲章节顺序写细粒度模块</strong>。
+若你在旧文档或输出里看到 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">kt_bp_exec_summary</code> 等名字，那是历史示例，当前 <code style="font-family:Consolas,'Courier New',monospace;font-size:10.0pt;background:#F4F4F4;padding:0 3pt;">graph.py</code> 已不再引用。</p>
+</div>
+
+</body>
+</html>
