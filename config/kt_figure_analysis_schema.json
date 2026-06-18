@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "artifact_type": "figure_analysis",
+  "description": "kt_extract 视觉模型对论文插图的逐图分析",
+  "root_fields": {
+    "figures_analyzed": "int",
+    "aggregate_summary": "string",
+    "figures": "array of per-figure objects"
+  },
+  "per_figure_fields": {
+    "fig_id": "与 source_figures 对应",
+    "caption": "图注",
+    "figure_type": "chart|diagram|photo|table_image|formula|unknown",
+    "summary": "图内容摘要",
+    "metrics": "string[] 关键数值/对比",
+    "experimental_findings": "string[] 实验结论",
+    "commercial_relevance": "产业化含义",
+    "trl_evidence": "成熟度线索",
+    "data_gaps": "string[]"
+  }
+}

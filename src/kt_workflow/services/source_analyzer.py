@@ -14,7 +14,7 @@ from kt_workflow.services.llm_client import analysis_mock_enabled, kt_llm_client
 from kt_workflow.state import KTWorkflowState
 from kt_workflow.text_io import workspace_root
 
-_LLM_INPUT_LIMIT = 28_000
+_LLM_INPUT_LIMIT = 48_000
 _CFG_REL = "config/kt_source_analysis_llm_cfg.json"
 
 
@@ -63,10 +63,37 @@ def _mock_analysis(state: KTWorkflowState, source_text: str) -> dict[str, Any]:
     }
 
 
+def _build_figure_context(figure_analysis: dict[str, Any] | None) -> str:
+    if not figure_analysis:
+        return "（无插图视觉分析）"
+    lines: list[str] = []
+    agg = (figure_analysis.get("aggregate_summary") or "").strip()
+    if agg:
+        lines.append(f"综合摘要：{agg}")
+    for fig in figure_analysis.get("figures") or []:
+        if not isinstance(fig, dict):
+            continue
+        if fig.get("error"):
+            continue
+        fid = fig.get("fig_id", "")
+        summary = fig.get("summary", "")
+        metrics = fig.get("metrics") or fig.get("experimental_findings") or []
+        cap = fig.get("caption", "")
+        block = f"- [{fid}] {cap}\n  摘要：{summary}"
+        if metrics:
+            block += "\n  要点：" + "；".join(str(m) for m in metrics[:5])
+        trl = fig.get("trl_evidence")
+        if trl:
+            block += f"\n  成熟度线索：{trl}"
+        lines.append(block)
+    return "\n".join(lines) if lines else "（插图分析为空）"
+
+
 def analyze_source_material(
     source_text: str,
     state: KTWorkflowState,
     *,
+    figure_analysis: dict[str, Any] | None = None,
     cfg_rel: str = _CFG_REL,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """
@@ -78,6 +105,7 @@ def analyze_source_material(
         "provider": "deepseek",
         "cfg_path": cfg_rel,
         "input_char_count": len(text),
+        "has_figure_analysis": bool(figure_analysis),
         "mock": False,
     }
 
@@ -115,6 +143,9 @@ def analyze_source_material(
         meta["mock"] = True
         return _mock_analysis(state, text), meta
 
+    figure_context = _build_figure_context(figure_analysis)
+    meta["figure_context_chars"] = len(figure_context)
+
     cfg = _load_cfg(cfg_rel)
     llm_config = cfg.get("config", {})
     model = kt_llm_model(str(llm_config.get("model", "deepseek-chat")))
@@ -127,6 +158,7 @@ def analyze_source_material(
         user_type=state.user_type or "高校",
         specific_requirements=state.specific_requirements or "无",
         source_text=llm_input,
+        figure_context=figure_context,
     )
 
     client = kt_llm_client()
@@ -146,4 +178,13 @@ def analyze_source_material(
     meta["raw_response_chars"] = len(raw_out)
 
     analysis = _extract_json_object(raw_out)
+    if figure_analysis:
+        analysis["figure_evidence_summary"] = figure_analysis.get("aggregate_summary") or ""
+        exp: list[str] = []
+        for fig in figure_analysis.get("figures") or []:
+            if isinstance(fig, dict):
+                exp.extend(fig.get("experimental_findings") or [])
+                exp.extend(fig.get("metrics") or [])
+        if exp:
+            analysis["experimental_evidence_from_figures"] = list(dict.fromkeys(str(x) for x in exp))[:12]
     return analysis, meta

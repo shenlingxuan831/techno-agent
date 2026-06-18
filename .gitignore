@@ -6,6 +6,9 @@ dist
 __pycache__/
 *.pyc
 .venv
+.venv-extract
+.venv_py314_backup
+.env.mineru.local
 *.o
 *.a
 /vendor
@@ -18,6 +21,8 @@ __pycache__/
 
 # kt_workflow：每次运行的 SQLite、Markdown/PDF、日志（均在仓库 var 下）
 /var/kt_workflow/
+# MinerU / HuggingFace / pip 大体积缓存（默认在项目盘 var/cache）
+/var/cache/
 
 # 历史默认路径；可删旧文件。新建库见 var/kt_workflow/databases/
 /data/

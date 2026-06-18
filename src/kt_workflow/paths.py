@@ -33,3 +33,17 @@ def kt_run_output_dir(run_id: str) -> Path:
     d.mkdir(parents=True, exist_ok=True)
     return d
 
+
+def kt_run_source_dir(run_id: str) -> Path:
+    """单次 run 的源文件解析产物：MinerU Markdown、抽取图片等。"""
+    d = kt_run_output_dir(run_id) / "source"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def kt_cache_root() -> Path:
+    """大体积缓存（MinerU / HuggingFace / pip）统一放仓库 var/cache，避免占 C 盘。"""
+    d = kt_repo_root() / "var" / "cache"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+

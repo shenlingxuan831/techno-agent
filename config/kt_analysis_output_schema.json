@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "description": "llm_source_analysis artifact 的 JSON 根对象字段（由 kt_analyze + config/kt_source_analysis_llm_cfg.json 产出）",
   "artifact_type": "llm_source_analysis",
   "slug": "default",
@@ -20,7 +20,14 @@
     "commercialization_barriers": "产业化障碍 string[]",
     "policy_fit_hint": "政策/资质方向",
     "keywords": "关键词 string[]",
-    "data_gaps": "材料缺失项 string[]"
+    "data_gaps": "材料缺失项 string[]",
+    "figure_evidence_summary": "插图视觉分析综合摘要（v2 可选）",
+    "experimental_evidence_from_figures": "从插图提取的实验/指标要点 string[]（v2 可选）"
   },
-  "merged_into": "structured_profile.analysis（由 kt_structure 写入）"
+  "related_artifacts": {
+    "extracted_markdown": "MinerU 结构化 Markdown",
+    "source_figures": "插图目录 JSON",
+    "figure_analysis": "视觉模型逐图分析 JSON"
+  },
+  "merged_into": "structured_profile v4（analysis + figures 块）"
 }

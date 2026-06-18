@@ -2,6 +2,9 @@
 
 SOURCE_META = "source_meta"
 EXTRACTED_TEXT = "extracted_text"
+EXTRACTED_MARKDOWN = "extracted_markdown"
+SOURCE_FIGURES = "source_figures"
+FIGURE_ANALYSIS = "figure_analysis"
 LLM_SOURCE_ANALYSIS = "llm_source_analysis"
 STRUCTURED_PROFILE = "structured_profile"
 BP_MODULE_TEXT = "bp_module_text"

@@ -1,6 +1,8 @@
-"""kt_analyze — 大模型分析 extracted_text，写入 llm_source_analysis。"""
+"""kt_analyze — 大模型分析 extracted_markdown + figure_analysis，写入 llm_source_analysis。"""
 
 from __future__ import annotations
+
+import json
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.runtime import Runtime
@@ -19,6 +21,17 @@ from kt_workflow.nodes._helpers import safe_json_dumps
 NODE_ID = "kt_analyze"
 
 
+def _load_figure_analysis(session, run_id: str) -> dict | None:
+    raw = art_repo.get_latest_text(session, run_id, C.FIGURE_ANALYSIS, "default")
+    if not raw or not raw.strip():
+        return None
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else None
+    except json.JSONDecodeError:
+        return None
+
+
 def kt_analyze_node(
     state: KTWorkflowState,
     config: RunnableConfig,
@@ -28,9 +41,18 @@ def kt_analyze_node(
         raise ValueError("kt_analyze: 缺少 run_id")
 
     with session_scope() as session:
+        markdown = art_repo.get_latest_text(session, state.run_id, C.EXTRACTED_MARKDOWN, "default")
         extracted = art_repo.get_latest_text(session, state.run_id, C.EXTRACTED_TEXT, "default") or ""
-        analysis, meta = analyze_source_material(extracted, state)
+        source_text = (markdown or extracted).strip()
+        figure_analysis = _load_figure_analysis(session, state.run_id)
+
+        analysis, meta = analyze_source_material(
+            source_text,
+            state,
+            figure_analysis=figure_analysis,
+        )
         meta["node"] = NODE_ID
+        meta["used_markdown"] = bool(markdown and markdown.strip())
         run_repo.update_run_stage(session, state.run_id, "analyze")
         art_repo.write_artifact(
             session,

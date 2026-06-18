@@ -2,7 +2,7 @@
 name = "vibe-coding"
 version = "0.1.0"
 description = "Coze Vibe Coding project"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "langchain==1.0.3",
     "langchain-openai==1.0.1",
@@ -30,6 +30,7 @@ dependencies = [
     "psycopg[binary]>=3.3,<4",
     "psycopg-pool>=3.3,<4",
     "pypdf>=6.4,<7",
+    "pymupdf>=1.24,<2",
     "docx2python>=3.5,<4",
     "openpyxl>=3.1,<4",
     "python-pptx>=1.0,<2",

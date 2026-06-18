@@ -15,7 +15,9 @@ try:
 except ImportError:
     load_dotenv = None  # type: ignore
 else:
-    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+    _repo_root = Path(__file__).resolve().parent.parent
+    load_dotenv(_repo_root / ".env")
+    load_dotenv(_repo_root / ".env.mineru.local")
 
 import cozeloop
 
