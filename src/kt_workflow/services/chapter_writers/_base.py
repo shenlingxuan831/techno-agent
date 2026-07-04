@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from kt_workflow.services.chapter_writer_contract import (
@@ -165,3 +166,29 @@ class BaseChapterWriter:
             "title": title,
             "spec": {"storage_uri": storage_uri, "alt": alt or title},
         }
+
+    @staticmethod
+    def chart_companion_body(intro: str, *paragraphs: str) -> str:
+        """needs_chart 模块正文：不写 Markdown 表格，表格仅由 bp_module_chart 提供。"""
+        parts = [intro.strip()]
+        parts.extend(p.strip() for p in paragraphs if p and str(p).strip())
+        return "\n\n".join(parts)
+
+    def write_narrative_module(
+        self,
+        ctx: ChapterWriterContext,
+        heading: str,
+        *,
+        section_brief: str,
+        word_limit: int,
+        fallback: Callable[[], str],
+    ) -> str:
+        from kt_workflow.services.chapter_llm_writer import write_narrative_with_fallback
+
+        return write_narrative_with_fallback(
+            ctx,
+            heading,
+            section_brief=section_brief,
+            word_limit=word_limit,
+            fallback=fallback,
+        )

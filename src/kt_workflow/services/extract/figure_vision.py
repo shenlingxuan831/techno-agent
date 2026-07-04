@@ -31,7 +31,16 @@ def _env_truthy(name: str) -> bool:
 
 
 def vision_mock_enabled() -> bool:
-    return _env_truthy("KT_VISION_MOCK") or _env_truthy("KT_ANALYSIS_MOCK_LLM")
+    if _env_truthy("KT_VISION_MOCK"):
+        return True
+    if _env_truthy("KT_VISION_FORCE"):
+        return False
+    key = (
+        (os.getenv("KT_VISION_API_KEY") or "").strip()
+        or (os.getenv("DASHSCOPE_API_KEY") or "").strip()
+        or (os.getenv("OPENAI_API_KEY") or "").strip()
+    )
+    return not key
 
 
 def _max_figures() -> int:
@@ -52,6 +61,7 @@ def _vision_client(cfg: dict[str, Any]) -> ChatOpenAI:
     llm_cfg = cfg.get("config", {})
     api_key = (
         (os.getenv("KT_VISION_API_KEY") or "").strip()
+        or (os.getenv("DASHSCOPE_API_KEY") or "").strip()
         or (os.getenv("DEEPSEEK_API_KEY") or "").strip()
         or (os.getenv("OPENAI_API_KEY") or "").strip()
         or (os.getenv("ARK_API_KEY") or "").strip()

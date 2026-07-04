@@ -22,7 +22,9 @@
     "keywords": "关键词 string[]",
     "data_gaps": "材料缺失项 string[]",
     "figure_evidence_summary": "插图视觉分析综合摘要（v2 可选）",
-    "experimental_evidence_from_figures": "从插图提取的实验/指标要点 string[]（v2 可选）"
+    "experimental_evidence_from_figures": "从插图提取的实验/指标要点 string[]（v2 可选）",
+    "document_type": "review|research|patent|report|other（商业化补强 v3 可选）",
+    "commercialization_opportunities": "转化机会 string[]（v3 可选）"
   },
   "related_artifacts": {
     "extracted_markdown": "MinerU 结构化 Markdown",

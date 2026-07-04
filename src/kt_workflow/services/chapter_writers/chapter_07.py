@@ -161,8 +161,18 @@ class Chapter07Writer(BaseChapterWriter):
         module_id = mod.get("id", "")
 
         # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch7_7_1":
-        #     return self._write_bp_ch7_7_1(ctx)
+        if module_id == "bp_ch7_7_1":
+            return self._write_bp_ch7_7_1(ctx)
+        elif module_id == "bp_ch7_7_2":
+            return self._write_bp_ch7_7_2(ctx)
+        elif module_id == "bp_ch7_7_3":
+            return self._write_bp_ch7_7_3(ctx)
+        elif module_id == "bp_ch7_7_4":
+            return self._write_bp_ch7_7_4(ctx)
+        elif module_id == "bp_ch7_7_5":
+            return self._write_bp_ch7_7_5(ctx)
+        elif module_id == "bp_ch7_7_6":
+            return self._write_bp_ch7_7_6(ctx)
 
         # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
@@ -197,8 +207,14 @@ class Chapter07Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        title = "项目年度成本明细表"
+        cols = ["成本类别", "年度金额", "备注"]
+        rows = [
+            ["固定成本", "【待验证】", "场地、人员、设备等"],
+            ["变动成本", "【待验证】", "耗材、运维、营销等"],
+            ["合计年度成本", "【待验证】", "汇总口径"]
+        ]
+        return self.table_chart(title, cols, rows)
 
     def _chart_bp_ch7_7_2(self, ctx: ChapterWriterContext):
         """
@@ -211,8 +227,15 @@ class Chapter07Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        title = "未来3-5年营业收入预测表"
+        cols = ["周期", "营业收入", "增长说明"]
+        rows = [
+            ["第1年", "【待验证】", "起步阶段"],
+            ["第2年", "【待验证】", "稳步增长"],
+            ["第3年", "【待验证】", "规模放量"],
+            ["第4-5年", "【待验证】", "稳定运营"]
+        ]
+        return self.table_chart(title, cols, rows)
 
     def _chart_bp_ch7_7_3(self, ctx: ChapterWriterContext):
         """
@@ -225,8 +248,10 @@ class Chapter07Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        title = "项目利润测算表"
+        cols = "营收总额", "总成本", "毛利润", "净利润"
+        rows = [["【待验证】", "【待验证】", "【待验证】", "【待验证】"]]
+        return self.table_chart(title, list(cols), rows)
 
     def _chart_bp_ch7_7_4(self, ctx: ChapterWriterContext):
         """
@@ -239,17 +264,59 @@ class Chapter07Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        title = "项目现金流预测表"
+        cols = ["项目", "当期流入", "当期流出", "净现金流"]
+        rows = [
+            ["经营现金流", "【待验证】", "【待验证】", "【待验证】"],
+            ["投资现金流", "【待验证】", "【待验证】", "【待验证】"],
+            ["筹资现金流", "【待验证】", "【待验证】", "【待验证】"],
+            ["合计", "【待验证】", "【待验证】", "【待验证】"]
+        ]
+        return self.table_chart(title, cols, rows)
 
-    # ------------------------------------------------------------------
-    # 正文私有方法示例（每个模块一个）：
-    #
-    # def _write_bp_ch7_7_1(self, ctx: ChapterWriterContext) -> str:
-    #     """写 成本测算 小节。"""
-    #     heading = self.module_heading(ctx)
-    #     summary = self.analysis_field(ctx, "summary")
-    #     return f"{heading}\n\n{summary}\n"
-    #
-    # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
-    # ------------------------------------------------------------------
+    def _write_bp_ch7_7_1(self, ctx: ChapterWriterContext) -> str:
+        heading = self.module_heading(ctx)
+        body = self.chart_companion_body(
+            "本小节对项目年度运营成本进行梳理统计，明细口径见附表。",
+            "【待验证】部分成本明细、计费标准尚未补充完整，相关数据以附录 F 假设口径为准。",
+        )
+        return f"{heading}\n\n{body}\n"
+
+    def _write_bp_ch7_7_2(self, ctx: ChapterWriterContext) -> str:
+        heading = self.module_heading(ctx)
+        body = self.chart_companion_body(
+            "本小节给出未来 3～5 年营业收入预测框架，具体数值见附表。",
+            "【待验证】收入预测需以试点订单、定价策略和市场渗透率假设为依据，当前材料尚未提供可核对底稿。",
+        )
+        return f"{heading}\n\n{body}\n"
+
+    def _write_bp_ch7_7_3(self, ctx: ChapterWriterContext) -> str:
+        heading = self.module_heading(ctx)
+        body = self.chart_companion_body(
+            "本小节汇总营收、成本与利润测算逻辑，测算结果见附表。",
+            "【待验证】毛利率与净利润需在成本与收入假设对齐后复核。",
+        )
+        return f"{heading}\n\n{body}\n"
+
+    def _write_bp_ch7_7_4(self, ctx: ChapterWriterContext) -> str:
+        heading = self.module_heading(ctx)
+        body = self.chart_companion_body(
+            "本小节展示经营/投资/筹资现金流预测结构，详见附表。",
+            "【待验证】现金流预测需与融资节奏、回款周期和资本性支出计划交叉验证。",
+        )
+        return f"{heading}\n\n{body}\n"
+
+    def _write_bp_ch7_7_5(self, ctx: ChapterWriterContext) -> str:
+        """7.5 盈亏平衡与敏感性分析"""
+        heading = self.module_heading(ctx)
+        balance_info = self.analysis_field(ctx, "break_even_analysis") or "暂无盈亏平衡及敏感性分析数据"
+        content = f"结合经营数据测算项目盈亏平衡点，并针对单价、销量、成本等核心变量开展敏感性分析，评估经营风险。{balance_info}。"
+        content += " 【待验证】临界值与变量波动影响暂未量化。"
+        return f"{heading}\n\n{content}\n"
+
+    def _write_bp_ch7_7_6(self, ctx: ChapterWriterContext) -> str:
+        """7.6 财务总结（≤400字）"""
+        heading = self.module_heading(ctx)
+        summary = self.analysis_field(ctx, "finance_summary") or ""
+        content = f"综合前述成本、收入、利润及现金流测算，{summary}项目整体财务模型框架完整，具备基本商业可行性。【待验证】因当前财务明细数据不足，各项测算均为阶段性参考，后续需补充真实经营数据完成精细化核算。项目盈利逻辑清晰，资金规划可匹配业务发展节奏。"
+        return f"{heading}\n\n{content}\n"

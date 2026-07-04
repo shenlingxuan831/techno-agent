@@ -164,8 +164,20 @@ class Chapter01Writer(BaseChapterWriter):
         现在：所有模块都走最后的 scaffold_module_text（占位）。
         你要做：用 module_id 分支，分别 return 真实 Markdown 字符串。
         """
-        mod = ctx["module"]
+        mod = ctx.get("module", {}) if isinstance(ctx, dict) else {}
         module_id = mod.get("id", "")
+        if module_id == "bp_ch1_1_1":
+            return self._write_bp_ch1_1_1(ctx)
+        if module_id == "bp_ch1_1_2":
+            return self._write_bp_ch1_1_2(ctx)
+        if module_id == "bp_ch1_1_3":
+            return self._write_bp_ch1_1_3(ctx)
+        if module_id == "bp_ch1_1_4":
+            return self._write_bp_ch1_1_4(ctx)
+        if module_id == "bp_ch1_1_5":
+            return self._write_bp_ch1_1_5(ctx)
+        if module_id == "bp_ch1_1_6":
+            return self._write_bp_ch1_1_6(ctx)
 
         # ---- 在这里按 module_id 添加分支（写真实正文）----
         # if module_id == "bp_ch1_1_1":
@@ -179,6 +191,199 @@ class Chapter01Writer(BaseChapterWriter):
         return None
 
     # ------------------------------------------------------------------
+
+    def _value_or_pending(self, value, label: str) -> str:
+        if value is None:
+            return f"【待验证】{label}尚未在材料中明确。"
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+        if isinstance(value, (list, tuple)) and value:
+            return "、".join(str(item).strip() for item in value if str(item).strip())
+        return f"【待验证】{label}尚未在材料中明确。"
+
+    def _heading(self, ctx: ChapterWriterContext) -> str:
+        try:
+            heading = self.module_heading(ctx)
+            if heading:
+                return heading
+        except Exception:
+            pass
+
+        module = ctx.get("module", {}) if isinstance(ctx, dict) else {}
+        ref = module.get("ref", "1.x")
+        title = module.get("title", "执行摘要")
+        return f"## {ref} {title}"
+
+    def _analysis_value(self, ctx: ChapterWriterContext, key: str):
+        try:
+            value = self.analysis_field(ctx, key)
+            if value not in (None, "", [], {}):
+                return value
+        except Exception:
+            pass
+
+        profile = ctx.get("profile", {}) if isinstance(ctx, dict) else {}
+        analysis = profile.get("analysis", {}) if isinstance(profile, dict) else {}
+        return analysis.get(key)
+
+    def _submission_value(self, ctx: ChapterWriterContext, key: str):
+        try:
+            value = self.submission_field(ctx, key)
+            if value not in (None, "", [], {}):
+                return value
+        except Exception:
+            pass
+
+        profile = ctx.get("profile", {}) if isinstance(ctx, dict) else {}
+        submission = profile.get("submission", {}) if isinstance(profile, dict) else {}
+        return submission.get(key)
+
+    def _as_list(self, value) -> list[str]:
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if str(item).strip()]
+        if isinstance(value, tuple):
+            return [str(item).strip() for item in value if str(item).strip()]
+        if isinstance(value, str) and value.strip():
+            return [value.strip()]
+        return []
+
+    def _bullet_points(self, values: list[str], max_items: int = 3) -> str:
+        if not values:
+            return "- 【待验证】材料中尚未提供足够信息。\n"
+        return "".join(f"- 【事实】{item}\n" for item in values[:max_items])
+
+    def _write_bp_ch1_1_1(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-一句话介绍：成果名称、目标用户/场景、核心价值，避免重复长句。",
+            word_limit=130,
+            fallback=lambda: self._legacy_write_bp_ch1_1_1(ctx),
+        )
+
+    def _write_bp_ch1_1_2(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-市场与场景：目标市场、应用场景；无依据不写 TAM/CAGR 数字，列出 data_gaps。",
+            word_limit=220,
+            fallback=lambda: self._legacy_write_bp_ch1_1_2(ctx),
+        )
+
+    def _write_bp_ch1_1_3(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-竞争优势：优势要点与竞争格局，缺量化对比则标【待验证】。",
+            word_limit=220,
+            fallback=lambda: self._legacy_write_bp_ch1_1_3(ctx),
+        )
+
+    def _write_bp_ch1_1_4(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-商业模式：可行商业化路径（交付/授权/合作），不写具体定价数字。",
+            word_limit=200,
+            fallback=lambda: self._legacy_write_bp_ch1_1_4(ctx),
+        )
+
+    def _write_bp_ch1_1_5(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-财务要点：仅说明测算框架与 data_gaps，禁止编造融资额/收入。",
+            word_limit=200,
+            fallback=lambda: self._legacy_write_bp_ch1_1_5(ctx),
+        )
+
+    def _write_bp_ch1_1_6(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self._heading(ctx),
+            section_brief="执行摘要-风险与结论：关键风险、阶段性推进结论（谨慎/可行），引用 disadvantages 与 data_gaps。",
+            word_limit=200,
+            fallback=lambda: self._legacy_write_bp_ch1_1_6(ctx),
+        )
+
+    def _legacy_write_bp_ch1_1_1(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        tech_name = self._analysis_value(ctx, "tech_name") or self._submission_value(ctx, "project_name")
+        scenarios = self._as_list(self._analysis_value(ctx, "application_scenarios"))
+        target_market = self._analysis_value(ctx, "target_market")
+
+        if tech_name and scenarios:
+            sentence = f"【推断】{tech_name}面向{scenarios[0]}场景，提供科研成果商业化解决方案。"
+        elif tech_name and target_market:
+            sentence = f"【推断】{tech_name}面向{target_market}市场，提供科研成果商业化解决方案。"
+        else:
+            sentence = "【待验证】成果名称、核心技术或应用场景仍需补充，暂无法形成完整一句话介绍。"
+
+        return f"{heading}\n\n{sentence}\n"
+
+    def _legacy_write_bp_ch1_1_2(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        target_market = self._value_or_pending(self._analysis_value(ctx, "target_market"), "目标市场")
+        scenarios = self._value_or_pending(self._analysis_value(ctx, "application_scenarios"), "应用场景")
+        gaps = self._value_or_pending(self._analysis_value(ctx, "data_gaps"), "市场规模、CAGR、TAM/SAM/SOM 数据")
+
+        return (
+            f"{heading}\n\n"
+            f"【事实】目标市场：{target_market}\n\n"
+            f"【事实】主要应用场景：{scenarios}\n\n"
+            f"【待验证】当前执行摘要暂不编造 TAM/SAM/SOM、CAGR 或市场规模数字；需补充依据：{gaps}\n"
+        )
+
+    def _legacy_write_bp_ch1_1_3(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        advantages = self._as_list(self._analysis_value(ctx, "advantages"))
+        competitive_landscape = self._analysis_value(ctx, "competitive_landscape")
+
+        body = self._bullet_points(advantages, max_items=3)
+        if competitive_landscape:
+            body += f"\n【事实】竞争格局摘要：{competitive_landscape}\n"
+        else:
+            body += "\n【待验证】尚缺少与竞品的量化对比，后续需补充参数、成本、效率或验证数据。\n"
+        return f"{heading}\n\n{body}"
+
+    def _legacy_write_bp_ch1_1_4(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        scenarios = self._value_or_pending(self._analysis_value(ctx, "application_scenarios"), "应用场景")
+        target_market = self._value_or_pending(self._analysis_value(ctx, "target_market"), "目标客户或市场")
+
+        return (
+            f"{heading}\n\n"
+            f"【推断】基于当前应用场景（{scenarios}）和目标市场（{target_market}），可优先采用项目制交付、技术授权、联合开发或示范场景共建等商业化路径。\n\n"
+            "【待验证】定价方式、渠道伙伴、收费周期和合同模式尚需结合客户访谈、试点成本与交付边界进一步确认。\n"
+        )
+
+    def _legacy_write_bp_ch1_1_5(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        data_gaps = self._value_or_pending(self._analysis_value(ctx, "data_gaps"), "财务测算数据")
+
+        return (
+            f"{heading}\n\n"
+            "【待验证】当前材料未稳定提供本轮融资金额、资金用途、年度营收预测、毛利率、现金流和回本周期等财务要点。\n\n"
+            f"【事实】需优先补充或核验的缺口：{data_gaps}\n\n"
+            "【推断】在财务数据补齐前，本章只能说明测算框架，不能输出具体融资额、收入规模或回本时间。\n"
+        )
+
+    def _legacy_write_bp_ch1_1_6(self, ctx: ChapterWriterContext) -> str:
+        heading = self._heading(ctx)
+        risks = self._as_list(self._analysis_value(ctx, "disadvantages"))
+        gaps = self._as_list(self._analysis_value(ctx, "data_gaps"))
+
+        risk_text = risks[0] if risks else "关键商业化风险尚未在材料中充分展开"
+        conclusion = "谨慎" if gaps else "可行"
+
+        return (
+            f"{heading}\n\n"
+            f"【事实】当前识别的关键风险：{risk_text}。\n\n"
+            "【推断】建议通过补充验证数据、明确试点客户、完善知识产权与财务测算来降低决策不确定性。\n\n"
+            f"【推断】阶段性结论：**{conclusion}推进**。若后续补齐市场、财务和验证数据，可进一步提高结论置信度。\n"
+        )
     # 正文私有方法示例（每个模块一个）：
     #
     # def _write_bp_ch1_1_1(self, ctx: ChapterWriterContext) -> str:

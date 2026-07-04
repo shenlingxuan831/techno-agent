@@ -187,4 +187,18 @@ def analyze_source_material(
                 exp.extend(fig.get("metrics") or [])
         if exp:
             analysis["experimental_evidence_from_figures"] = list(dict.fromkeys(str(x) for x in exp))[:12]
+
+    try:
+        from kt_workflow.services.commercial_enrichment import enrich_commercial_fields
+
+        analysis, enrich_meta = enrich_commercial_fields(
+            text,
+            state,
+            analysis,
+            figure_analysis=figure_analysis,
+        )
+        meta["commercial_enrichment"] = enrich_meta
+    except Exception as exc:
+        meta["commercial_enrichment"] = {"skipped": True, "error": str(exc)}
+
     return analysis, meta

@@ -187,6 +187,33 @@ class Chapter09Writer(BaseChapterWriter):
     # ------------------------------------------------------------------
 
     def _write_bp_ch9_9_1(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="结论-可行性：综合 summary/TRL/优势/障碍，给出「可推进、需验证」式审慎结论，引用 data_gaps。",
+            word_limit=350,
+            fallback=lambda: self._legacy_write_bp_ch9_9_1(ctx),
+        )
+
+    def _write_bp_ch9_9_2(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="结论-核心价值：3 条以内价值点 + 目标市场/场景，避免重复同一长句。",
+            word_limit=320,
+            fallback=lambda: self._legacy_write_bp_ch9_9_2(ctx),
+        )
+
+    def _write_bp_ch9_9_3(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="结论-未来展望：短中长期规划框架，不写无依据的时间表/预算/客户名单。",
+            word_limit=350,
+            fallback=lambda: self._legacy_write_bp_ch9_9_3(ctx),
+        )
+
+    def _legacy_write_bp_ch9_9_1(self, ctx: ChapterWriterContext) -> str:
         """写 9.1 项目可行性结论。"""
         heading = self.module_heading(ctx)
         tech_name = self._tech_name(ctx)
@@ -208,7 +235,7 @@ class Chapter09Writer(BaseChapterWriter):
             f"> 【待验证】{gap_text}\n"
         )
 
-    def _write_bp_ch9_9_2(self, ctx: ChapterWriterContext) -> str:
+    def _legacy_write_bp_ch9_9_2(self, ctx: ChapterWriterContext) -> str:
         """写 9.2 核心价值总结。"""
         heading = self.module_heading(ctx)
         tech_name = self._tech_name(ctx)
@@ -227,7 +254,7 @@ class Chapter09Writer(BaseChapterWriter):
             f"【推断】面向{market}，项目后续价值释放应围绕“{scenario_text}”展开，通过验证数据、试点案例和成本收益测算逐步证明其商业可行性。\n"
         )
 
-    def _write_bp_ch9_9_3(self, ctx: ChapterWriterContext) -> str:
+    def _legacy_write_bp_ch9_9_3(self, ctx: ChapterWriterContext) -> str:
         """写 9.3 未来展望。"""
         heading = self.module_heading(ctx)
         tech_name = self._tech_name(ctx)

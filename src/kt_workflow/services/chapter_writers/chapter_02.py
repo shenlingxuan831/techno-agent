@@ -148,61 +148,214 @@ class Chapter02Writer(BaseChapterWriter):
     IMPLEMENTER_MODULE = __name__
 
     def generate_module_text(self, ctx: ChapterWriterContext) -> str:
-        """
-        【你要改的核心函数】
-
-        chapter_runner 每处理注册表里的一个模块，就会调用一次本函数。
-        ctx["module"] 就是「当前这一小节」的信息（id、标题、writer_hint 等）。
-        ctx["profile"] 是上游准备好的 structured_profile（重点用 ["analysis"]）。
-
-        现在：所有模块都走最后的 scaffold_module_text（占位）。
-        你要做：用 module_id 分支，分别 return 真实 Markdown 字符串。
-        """
         mod = ctx["module"]
         module_id = mod.get("id", "")
 
-        # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch2_2_1":
-        #     return self._write_bp_ch2_2_1(ctx)
+        if module_id == "bp_ch2_2_1":
+            return self._write_bp_ch2_2_1(ctx)
+        if module_id == "bp_ch2_2_2":
+            return self._write_bp_ch2_2_2(ctx)
+        if module_id == "bp_ch2_2_3":
+            return self._write_bp_ch2_2_3(ctx)
+        if module_id == "bp_ch2_2_4":
+            return self._write_bp_ch2_2_4(ctx)
 
-        # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
 
     def generate_module_chart(self, ctx: ChapterWriterContext):
-        """
-        【图表入口 — 与 generate_module_text 配对】
-
-        仅当注册表 needs_chart=true 时，chapter_runner 才会调用本函数。
-        返回 dict 写入 bp_module_chart，slug 与正文相同（module["id"]）。
-        正文写完后，在这里为同一 module_id 返回 table / mermaid / image_ref。
-        """
         module_id = ctx["module"].get("id", "")
         if module_id == "bp_ch2_2_4":
             return self._chart_bp_ch2_2_4(ctx)
         return self.scaffold_module_chart(ctx)
 
     def _chart_bp_ch2_2_4(self, ctx: ChapterWriterContext):
-        """
-        【图表占位】2.4 发展愿景与路线图
-        slug=bp_ch2_2_4（与正文 bp_module_text 相同）
-        建议 chart_type: mermaid  writer_hint: 路线图 chart
+        """2.4 发展愿景与路线图 — mermaid 甘特图"""
+        return self.mermaid_chart(
+            "发展愿景与路线图",
+            "gantt\n"
+            "    title 项目发展路线图\n"
+            "    dateFormat  YYYY-MM\n"
+            "    axisFormat  %Y-%m\n"
+            "    section 技术研发\n"
+            "    核心技术攻关           :done, tech1, 2024-01, 2025-06\n"
+            "    中试放大验证           :active, tech2, 2025-07, 2026-12\n"
+            "    工艺优化定型           :tech3, 2027-01, 2027-12\n"
+            "    section 产品化\n"
+            "    产品原型开发           :active, prod1, 2025-07, 2026-06\n"
+            "    小批量试产             :prod2, 2026-07, 2027-06\n"
+            "    规模化量产             :prod3, 2027-07, 2028-12\n"
+            "    section 商业化\n"
+            "    试点应用推广           :biz1, 2026-07, 2027-12\n"
+            "    渠道体系建设           :biz2, 2027-07, 2028-12\n"
+            "    全面市场拓展           :biz3, 2029-01, 2030-12\n"
+        )
 
-        实现方式示例：
-          - 表格: return self.table_chart("标题", ["列1","列2"], [["【待验证】","…"]])
-          - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
-          - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
-        """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+    def _write_bp_ch2_2_1(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="项目背景-研发背景：行业/技术背景、TRL 与依据、应用场景，勿重复粘贴长段 team 信息。",
+            word_limit=320,
+            fallback=lambda: self._legacy_write_bp_ch2_2_1(ctx),
+        )
 
-    # ------------------------------------------------------------------
-    # 正文私有方法示例（每个模块一个）：
-    #
-    # def _write_bp_ch2_2_1(self, ctx: ChapterWriterContext) -> str:
-    #     """写 研发背景 小节。"""
-    #     heading = self.module_heading(ctx)
-    #     summary = self.analysis_field(ctx, "summary")
-    #     return f"{heading}\n\n{summary}\n"
-    #
-    # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
-    # ------------------------------------------------------------------
+    def _write_bp_ch2_2_2(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="项目背景-成果现状：TRL 阶段、已有成果、团队资源概况（概括即可）。",
+            word_limit=320,
+            fallback=lambda: self._legacy_write_bp_ch2_2_2(ctx),
+        )
+
+    def _write_bp_ch2_2_3(self, ctx: ChapterWriterContext) -> str:
+        return self.write_narrative_module(
+            ctx,
+            self.module_heading(ctx),
+            section_brief="项目背景-商业定位：价值主张、目标市场、差异化优势，结构化叙述。",
+            word_limit=350,
+            fallback=lambda: self._legacy_write_bp_ch2_2_3(ctx),
+        )
+
+    def _legacy_write_bp_ch2_2_1(self, ctx: ChapterWriterContext) -> str:
+        """2.1 研发背景"""
+        heading = self.module_heading(ctx)
+        summary = self.analysis_field(ctx, "summary")
+        trl_level = self.analysis_field(ctx, "trl_level")
+        trl_rationale = self.analysis_field(ctx, "trl_rationale")
+        scenarios = self.analysis_field(ctx, "application_scenarios")
+
+        lines = [heading, ""]
+        if summary:
+            lines.append(f"本项目源于以下背景：【事实】{summary}")
+        else:
+            lines.append("本项目源于对行业痛点与技术趋势的深度研判。【推断】")
+
+        if trl_level:
+            lines.append(f"当前技术就绪度（TRL）为 {trl_level} 级。")
+        if trl_rationale:
+            lines.append(f"评级依据：【事实】{trl_rationale}")
+
+        if scenarios:
+            lines.append(f"主要应用场景覆盖：【事实】{scenarios}")
+        else:
+            lines.append("应用场景覆盖领域尚需进一步明确。【待验证】")
+
+        return "\n\n".join(lines)
+
+    def _legacy_write_bp_ch2_2_2(self, ctx: ChapterWriterContext) -> str:
+        """2.2 成果现状"""
+        heading = self.module_heading(ctx)
+        trl_level = self.analysis_field(ctx, "trl_level")
+        trl_rationale = self.analysis_field(ctx, "trl_rationale")
+        team = self.analysis_field(ctx, "team_and_resources")
+
+        lines = [heading, ""]
+
+        if trl_level:
+            lines.append(
+                f"截至目前，项目整体处于 **TRL {trl_level}** 阶段。"
+                f"【{'事实' if trl_rationale else '推断'}】"
+            )
+        else:
+            lines.append("项目技术就绪度（TRL）尚待评估。【待验证】")
+
+        if trl_rationale:
+            lines.append(f"阶段性成果包括：【事实】{trl_rationale}")
+
+        lines.append(
+            "已完成的重点工作涵盖技术可行性验证、核心指标达标及初步应用测试。"
+            "【推断】"
+        )
+
+        if team:
+            lines.append(f"团队与资源现状：【事实】{team}")
+        else:
+            lines.append("团队配置与资源投入情况尚待补充。【待验证】")
+
+        lines.append(
+            "当前阶段的核心挑战在于从中试验证向规模化应用过渡，"
+            "需要在工艺稳定性与成本控制方面取得突破。【推断】"
+        )
+
+        return "\n\n".join(lines)
+
+    def _legacy_write_bp_ch2_2_3(self, ctx: ChapterWriterContext) -> str:
+        """2.3 商业定位"""
+        heading = self.module_heading(ctx)
+        scenarios = self.analysis_field(ctx, "application_scenarios")
+        summary = self.analysis_field(ctx, "summary")
+
+        lines = [heading, ""]
+
+        lines.append("**价值主张**")
+        lines.append("")
+        if summary:
+            lines.append(f"本项目以技术优势为核心驱动，为下游产业提供高附加值解决方案。【推断】")
+        else:
+            lines.append("价值主张需结合具体技术特征进一步凝练。【待验证】")
+
+        lines.append("")
+        lines.append("**目标市场定位**")
+        lines.append("")
+        if scenarios:
+            lines.append(f"基于现有分析，项目聚焦以下应用场景：【事实】{scenarios}")
+        else:
+            lines.append("目标市场与应用场景待进一步调研明确。【待验证】")
+
+        lines.append("")
+        lines.append("**差异化优势**")
+        lines.append("")
+        lines.append(
+            "本项目的商业定位区别于传统技术路线之处在于："
+            "以技术创新为壁垒，以场景深耕为路径，以产业协同为杠杆。"
+            "【推断】"
+        )
+
+        return "\n".join(lines)
+
+    def _write_bp_ch2_2_4(self, ctx: ChapterWriterContext) -> str:
+        """2.4 发展愿景与路线图"""
+        heading = self.module_heading(ctx)
+        trl_level = self.analysis_field(ctx, "trl_level")
+
+        lines = [heading, ""]
+
+        lines.append("本项目遵循「技术成熟 → 产品落地 → 商业放量」三阶段递进路径。")
+        lines.append("")
+
+        lines.append("**第一阶段：技术深耕期**")
+        lines.append("")
+        if trl_level:
+            lines.append(
+                f"当前 TRL {trl_level} 为起点，完成核心技术攻关与中试放大验证，"
+                f"实现技术参数全面达标。【{'事实' if trl_level else '推断'}】"
+            )
+        else:
+            lines.append(
+                "完成核心技术攻关与中试放大验证，实现技术参数全面达标。【待验证】"
+            )
+
+        lines.append("")
+        lines.append("**第二阶段：产品转化期**")
+        lines.append("")
+        lines.append(
+            "完成产品原型开发与小批量试产，通过试点应用积累运行数据，"
+            "建立标准化生产流程与质量体系。【推断】"
+        )
+
+        lines.append("")
+        lines.append("**第三阶段：商业拓展期**")
+        lines.append("")
+        lines.append(
+            "实现规模化量产，构建覆盖目标市场的渠道网络，"
+            "推进产业链上下游协同，达成商业化闭环。【推断】"
+        )
+
+        lines.append("")
+        lines.append(
+            "> 以上各阶段时间节点与里程碑详见配套路线图（甘特图）。"
+            "具体时间规划需结合融资节奏与市场反馈动态调整。【待验证】"
+        )
+
+        return "\n".join(lines)

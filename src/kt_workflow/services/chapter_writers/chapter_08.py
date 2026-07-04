@@ -161,8 +161,16 @@ class Chapter08Writer(BaseChapterWriter):
         module_id = mod.get("id", "")
 
         # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch8_8_1":
-        #     return self._write_bp_ch8_8_1(ctx)
+        if module_id == "bp_ch8_8_1":
+            return self._write_bp_ch8_8_1(ctx)
+        elif module_id == "bp_ch8_8_2":
+            return self._write_bp_ch8_8_2(ctx)
+        elif module_id == "bp_ch8_8_3":
+            return self._write_bp_ch8_8_3(ctx)
+        elif module_id == "bp_ch8_8_4":
+            return self._write_bp_ch8_8_4(ctx)
+        elif module_id == "bp_ch8_8_5":
+            return self._write_bp_ch8_8_5(ctx)
 
         # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
@@ -191,17 +199,45 @@ class Chapter08Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        title = "项目风险概率-影响矩阵表"
+        cols = ["风险类型", "发生概率", "影响程度", "风险等级"]
+        rows = [
+            ["技术风险", "【待验证】", "【待验证】", "【待验证】"],
+            ["市场风险", "【待验证】", "【待验证】", "【待验证】"],
+            ["政策风险", "【待验证】", "【待验证】", "【待验证】"],
+            ["运营风险", "【待验证】", "【待验证】", "【待验证】"]
+        ]
+        return self.table_chart(title, cols, rows)
 
-    # ------------------------------------------------------------------
-    # 正文私有方法示例（每个模块一个）：
-    #
-    # def _write_bp_ch8_8_1(self, ctx: ChapterWriterContext) -> str:
-    #     """写 技术风险 小节。"""
-    #     heading = self.module_heading(ctx)
-    #     summary = self.analysis_field(ctx, "summary")
-    #     return f"{heading}\n\n{summary}\n"
-    #
-    # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
-    # ------------------------------------------------------------------
+    def _write_bp_ch8_8_1(self, ctx: ChapterWriterContext) -> str:
+        """8.1 技术风险"""
+        heading = self.module_heading(ctx)
+        risk_info = self.analysis_field(ctx, "disadvantages") or ""
+        content = f"本小节分析项目存在的技术层面风险。{risk_info}项目在技术迭代、稳定性、落地适配等环节存在不确定性。【待验证】具体技术隐患、故障概率及规避方案待补充完善。"
+        return f"{heading}\n\n{content}\n"
+
+    def _write_bp_ch8_8_2(self, ctx: ChapterWriterContext) -> str:
+        """8.2 市场风险"""
+        heading = self.module_heading(ctx)
+        risk_info = self.analysis_field(ctx, "commercialization_barriers") or ""
+        content = f"本节梳理市场竞争、用户接受度、行情波动等风险。{risk_info}外部市场环境变化易对项目推广与营收造成冲击。【待验证】市场竞品态势、客户流失风险暂未量化评估。"
+        return f"{heading}\n\n{content}\n"
+
+    def _write_bp_ch8_8_3(self, ctx: ChapterWriterContext) -> str:
+        """8.3 政策风险"""
+        heading = self.module_heading(ctx)
+        policy_hint = self.analysis_field(ctx, "policy_fit_hint") or ""
+        content = f"结合行业监管要求，研判政策变动带来的影响。{policy_hint}相关法规、行业标准调整可能约束项目经营模式。【待验证】最新政策适配性与应对预案有待细化。"
+        return f"{heading}\n\n{content}\n"
+
+    def _write_bp_ch8_8_4(self, ctx: ChapterWriterContext) -> str:
+        """8.4 运营风险"""
+        heading = self.module_heading(ctx)
+        content = "项目在人员管理、流程管控、供应链及日常运维环节存在运营风险。内部管理疏漏、执行效率不足、协作衔接问题都可能拖累项目进度。【待验证】运营漏洞、内控隐患及整改措施尚未明确。"
+        return f"{heading}\n\n{content}\n"
+
+    def _write_bp_ch8_8_5(self, ctx: ChapterWriterContext) -> str:
+        """8.5 风险矩阵与综合评估"""
+        heading = self.module_heading(ctx)
+        content = "结合前文四类风险，通过概率与影响程度搭建风险矩阵，划分风险等级，区分主次风险。针对高等级风险优先制定防控与应对策略，降低项目整体不确定性。【待验证】各项风险的量化评分、分级标准及专项方案待补充。"
+        return f"{heading}\n\n{content}\n"

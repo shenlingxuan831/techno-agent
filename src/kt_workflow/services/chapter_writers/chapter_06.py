@@ -137,6 +137,9 @@ Markdown 正文（及可选图表 JSON），写入 `bp_module_text` / `bp_module
 
 from __future__ import annotations
 
+import re
+from typing import Any
+
 from kt_workflow.services.chapter_writer_contract import ChapterWriterContext, ModuleChartSpec
 from kt_workflow.services.chapter_writers._base import BaseChapterWriter
 
@@ -161,14 +164,20 @@ class Chapter06Writer(BaseChapterWriter):
         mod = ctx["module"]
         module_id = mod.get("id", "")
 
-        # ---- 在这里按 module_id 添加分支（写真实正文）----
-        # if module_id == "bp_ch6_6_1":
-        #     return self._write_bp_ch6_6_1(ctx)
+        if module_id == "bp_ch6_6_1":
+            return self._write_bp_ch6_6_1(ctx)
+        if module_id == "bp_ch6_6_2":
+            return self._write_bp_ch6_6_2(ctx)
+        if module_id == "bp_ch6_6_3":
+            return self._write_bp_ch6_6_3(ctx)
+        if module_id == "bp_ch6_6_4":
+            return self._write_bp_ch6_6_4(ctx)
+        if module_id == "bp_ch6_6_5":
+            return self._write_bp_ch6_6_5(ctx)
 
-        # 未实现的模块仍返回占位（方便联调；全部实现后可删）
         return self.scaffold_module_text(ctx)
 
-    def generate_module_chart(self, ctx: ChapterWriterContext):
+    def generate_module_chart(self, ctx: ChapterWriterContext) -> ModuleChartSpec:
         """
         【图表入口 — 与 generate_module_text 配对】
 
@@ -196,8 +205,19 @@ class Chapter06Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        rows = []
+        team_points = self._team_points(ctx, limit=3)
+        for idx in range(3):
+            member = team_points[idx] if idx < len(team_points) else "【待验证】"
+            rows.append(
+                [
+                    f"核心成员{idx + 1}",
+                    self._truncate(member, 24),
+                    "研发/产业化/市场推进",
+                    "【待验证】",
+                ]
+            )
+        return self.table_chart("核心团队履历表", ["成员", "履历或优势", "当前职责", "证据状态"], rows)
 
     def _chart_bp_ch6_6_3(self, ctx: ChapterWriterContext):
         """
@@ -210,8 +230,16 @@ class Chapter06Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        advantage = self._label(self._advantages_phrase(ctx, 1), "资源能力")
+        ip = self._label(self._ip_phrase(ctx, 1), "知识产权")
+        mermaid = (
+            "flowchart LR\n"
+            f'    A["团队基础\\n{self._label(self._team_phrase(ctx), "团队基础")}"] --> B["资源优势\\n{advantage}"]\n'
+            '    B --> C["产业协同\\n试制/验证/交付"]\n'
+            f'    C --> D["IP 支撑\\n{ip}"]\n'
+            '    D --> E["商业转化\\n示范与复制"]'
+        )
+        return self.mermaid_chart("团队与资源协同图", mermaid)
 
     def _chart_bp_ch6_6_5(self, ctx: ChapterWriterContext):
         """
@@ -224,17 +252,185 @@ class Chapter06Writer(BaseChapterWriter):
           - 流程: return self.mermaid_chart("标题", "flowchart LR\n  A-->B")
           - 图片: return self.image_ref_chart("标题", "var/kt_workflow/runs/{run_id}/charts/xxx.png")
         """
-        # TODO: 替换为真实 chart spec（与同名 module 的正文内容一致）
-        return self.scaffold_module_chart(ctx)
+        landscape = self._competitive_points(ctx, limit=2)
+        rows = [
+            ["产品能力", self._advantages_phrase(ctx, 2), self._join_or_default(landscape[:1], "【待验证】"), "【推断】"],
+            ["用户价值", self._team_phrase(ctx), self._join_or_default(landscape[1:2], "【待验证】"), "【推断】"],
+        ]
+        return self.table_chart("竞争优势双视角对比", ["视角", "本项目优势", "竞品或行业现状", "证据状态"], rows)
 
     # ------------------------------------------------------------------
-    # 正文私有方法示例（每个模块一个）：
-    #
-    # def _write_bp_ch6_6_1(self, ctx: ChapterWriterContext) -> str:
-    #     """写 核心团队 小节。"""
-    #     heading = self.module_heading(ctx)
-    #     summary = self.analysis_field(ctx, "summary")
-    #     return f"{heading}\n\n{summary}\n"
-    #
-    # 图表私有方法见上方 _chart_* （与 needs_chart 模块一一对应）
+    # 正文私有方法与通用辅助函数
     # ------------------------------------------------------------------
+    def _write_bp_ch6_6_1(self, ctx: ChapterWriterContext) -> str:
+        return self._compose_module(
+            ctx,
+            f"【事实】核心团队应围绕{self._team_phrase(ctx)}形成“技术研发 + 产业化交付 + 商务拓展”的基本分工，重点突出与成果转化直接相关的经验与资源整合能力。",
+            "【待验证】如材料未明确成员姓名、职务与履历，建议仅概括团队结构，不补写具体个人头衔或过往业绩数据。",
+        )
+
+    def _write_bp_ch6_6_2(self, ctx: ChapterWriterContext) -> str:
+        return self._compose_module(
+            ctx,
+            "【事实】顾问团队宜补足项目在产业认知、行业渠道、政策理解和商业化节奏控制上的短板，承担资源引荐、关键决策评估和外部背书功能。",
+            "【待验证】当前材料若未列明顾问名单、单位和合作方式，应预留顾问方向而非虚构具体专家配置。",
+        )
+
+    def _write_bp_ch6_6_3(self, ctx: ChapterWriterContext) -> str:
+        return self._compose_module(
+            ctx,
+            f"【事实】资源优势主要体现在{self._advantages_phrase(ctx, 3)}，这些条件有助于缩短从研发样机到场景验证再到标准化交付的推进周期。",
+            f"【推断】若能进一步与{self._team_phrase(ctx)}形成稳定协同，项目在试点获取、交付复制和客户信任建立方面将更具持续性。",
+        )
+
+    def _write_bp_ch6_6_4(self, ctx: ChapterWriterContext) -> str:
+        return self._compose_module(
+            ctx,
+            f"【事实】组织侧 IP 布局应围绕{self._ip_phrase(ctx, 3)}展开，重点体现专利、软著、标准或 know-how 在团队分工与商业推进中的保护作用，而非重复技术机理本身。",
+            "【推断】建议将核心专利用于锁定关键模块和交付接口，将外围布局用于支撑合作谈判、授权转化和后续产品线延展。",
+        )
+
+    def _write_bp_ch6_6_5(self, ctx: ChapterWriterContext) -> str:
+        return self._compose_module(
+            ctx,
+            f"【事实】从产品视角看，本项目优势集中在{self._advantages_phrase(ctx, 2)}；从用户视角看，更重要的是能否在交付效率、效果稳定性和服务响应上形成优于替代方案的综合体验。",
+            f"【推断】结合{self._competitive_phrase(ctx, 2)}来看，后续应继续强化差异化证据、标杆案例和复购机制，以扩大竞争壁垒。",
+        )
+
+    def _compose_module(self, ctx: ChapterWriterContext, *paragraphs: str) -> str:
+        heading = self.module_heading(ctx)
+        body = [heading]
+        for paragraph in paragraphs:
+            cleaned = self._clean(paragraph)
+            if cleaned:
+                body.append(cleaned)
+        return "\n\n".join(body) + "\n"
+
+    def _analysis_data(self, ctx: ChapterWriterContext) -> dict[str, Any]:
+        profile = ctx.get("profile") or {}
+        if not isinstance(profile, dict):
+            return {}
+        analysis = profile.get("analysis") or {}
+        return analysis if isinstance(analysis, dict) else {}
+
+    def _analysis_value(self, ctx: ChapterWriterContext, field: str) -> Any:
+        return self._analysis_data(ctx).get(field)
+
+    def _analysis_points(self, ctx: ChapterWriterContext, field: str, limit: int = 3) -> list[str]:
+        points = self._flatten_points(self._analysis_value(ctx, field))
+        if not points:
+            return ["【待验证】"]
+        return points[:limit]
+
+    def _team_points(self, ctx: ChapterWriterContext, limit: int = 3) -> list[str]:
+        return self._analysis_points(ctx, "team_and_resources", limit)
+
+    def _competitive_points(self, ctx: ChapterWriterContext, limit: int = 2) -> list[str]:
+        return self._analysis_points(ctx, "competitive_landscape", limit)
+
+    def _team_phrase(self, ctx: ChapterWriterContext) -> str:
+        return self._join_or_default(self._team_points(ctx, limit=2), "团队能力")
+
+    def _advantages_phrase(self, ctx: ChapterWriterContext, limit: int) -> str:
+        return self._join_or_default(self._analysis_points(ctx, "advantages", limit), "资源与能力优势")
+
+    def _ip_phrase(self, ctx: ChapterWriterContext, limit: int) -> str:
+        ip_points = self._analysis_points(ctx, "ip_status", limit)
+        if ip_points == ["【待验证】"]:
+            return "专利、软著与技术秘密"
+        return self._join_or_default(ip_points, "专利、软著与技术秘密")
+
+    def _competitive_phrase(self, ctx: ChapterWriterContext, limit: int) -> str:
+        return self._join_or_default(self._competitive_points(ctx, limit), "行业替代方案仍需进一步核验")
+
+    def _join_or_default(self, items: list[str], fallback: str) -> str:
+        cleaned = [self._truncate(item, 22) for item in items if self._clean(item) and not self._clean(item).startswith("【待验证】")]
+        if not cleaned:
+            return fallback
+        return "、".join(cleaned)
+
+    def _flatten_points(self, value: Any) -> list[str]:
+        points: list[str] = []
+        self._collect_points(value, points)
+        unique_points: list[str] = []
+        seen: set[str] = set()
+        for point in points:
+            cleaned = self._clean(point)
+            if cleaned and cleaned not in seen:
+                seen.add(cleaned)
+                unique_points.append(cleaned)
+        return unique_points
+
+    def _collect_points(self, value: Any, points: list[str]) -> None:
+        if value is None:
+            return
+        if isinstance(value, (str, int, float, bool)):
+            for part in re.split(r"[\n；;]+", str(value)):
+                cleaned = self._clean(part)
+                if cleaned:
+                    points.append(cleaned)
+            return
+        if isinstance(value, dict):
+            preferred_scalar_keys = (
+                "summary",
+                "description",
+                "desc",
+                "overview",
+                "value",
+                "content",
+                "text",
+                "name",
+                "title",
+                "role",
+                "resource",
+                "advantage",
+                "status",
+            )
+            preferred_nested_keys = (
+                "items",
+                "list",
+                "points",
+                "members",
+                "resources",
+                "advantages",
+                "patents",
+                "landscape",
+                "competitors",
+                "details",
+            )
+            for key in preferred_scalar_keys:
+                if key in value:
+                    self._collect_points(value.get(key), points)
+            for key in preferred_nested_keys:
+                if key in value:
+                    self._collect_points(value.get(key), points)
+            if not points:
+                for key, nested_value in list(value.items())[:4]:
+                    summary = self._first_point(nested_value)
+                    if summary:
+                        points.append(f"{key}：{self._truncate(summary, 24)}")
+            return
+        if isinstance(value, (list, tuple, set)):
+            for item in value:
+                self._collect_points(item, points)
+
+    def _first_point(self, value: Any) -> str:
+        points = self._flatten_points(value)
+        return points[0] if points else ""
+
+    def _label(self, text: str, fallback: str) -> str:
+        cleaned = self._clean(text)
+        if not cleaned or cleaned.startswith("【待验证】"):
+            return fallback
+        return re.sub(r'["\[\]\{\}`]', "", self._truncate(cleaned, 18))
+
+    def _truncate(self, text: str, max_chars: int) -> str:
+        cleaned = self._clean(text)
+        if not cleaned:
+            return ""
+        if len(cleaned) <= max_chars:
+            return cleaned
+        return cleaned[: max_chars - 1].rstrip("，,；;。 ") + "…"
+
+    def _clean(self, text: Any) -> str:
+        return re.sub(r"\s+", " ", str(text)).strip()
