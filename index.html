@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 国赛数模备战 · 工作台</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--line:#e3e7ec;--tx:#1b2027;--tx2:#5a6472;
+  --ac:#2563eb;--ac2:#eff4ff;--ok:#0f9960;--wn:#c2410c;--pp:#6d28d9;
+  --sh:0 1px 2px rgba(16,24,40,.05),0 8px 24px rgba(16,24,40,.08);--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:linear-gradient(180deg,#f0f4ff 0%,#f6f7f9 35%);
+  color:var(--tx);line-height:1.7;min-height:100vh;padding:40px 20px 60px}
+.wrap{max-width:980px;margin:0 auto}
+.hero{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0e7490 100%);
+  color:#fff;padding:34px 36px;border-radius:18px;margin-bottom:32px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-70px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.15),transparent 65%)}
+.hero h1{font-size:26px;font-weight:800;margin-bottom:8px;letter-spacing:.4px}
+.hero p{opacity:.92;font-size:14.5px;max-width:620px}
+.tag{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;line-height:1.7}
+.t-blue{background:rgba(255,255,255,.2);color:#fff}
+.cd{display:inline-flex;gap:8px;margin-top:14px}
+.cd-box{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  border-radius:8px;padding:6px 12px;text-align:center;min-width:50px}
+.cd-box b{display:block;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.cd-box span{font-size:11px;opacity:.85}
+h2{font-size:15px;font-weight:700;color:var(--tx2);margin:24px 0 14px;letter-spacing:1px}
+.cards{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:760px){.cards{grid-template-columns:1fr 1fr}}
+.c{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;
+  box-shadow:var(--sh);transition:.15s;text-decoration:none;color:inherit;display:block;position:relative;
+  border-left:4px solid var(--ac)}
+.c:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(16,24,40,.12);text-decoration:none}
+.c h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.c .sub{font-size:12.5px;color:var(--tx3);margin-bottom:10px}
+.c p{font-size:13.8px;color:var(--tx2)}
+.c .pill{position:absolute;top:18px;right:18px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.arrow{position:absolute;bottom:18px;right:20px;color:var(--tx3);font-size:18px;transition:.15s}
+.c:hover .arrow{color:var(--ac);transform:translateX(4px)}
+.tip{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--wn);
+  border-radius:0 var(--r) var(--r) 0;padding:14px 18px;margin-top:24px;font-size:13.5px;color:var(--tx2)}
+.tip b{color:var(--wn)}
+.foot{text-align:center;color:var(--tx3);font-size:12.3px;margin-top:36px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <span class="tag t-blue">2026 高教社杯</span>
+      <span class="tag t-blue">C 题主攻</span>
+    </div>
+    <h1>全国大学生数学建模竞赛 · 备战工作台</h1>
+    <p>2026 年 9 月 10 日 18:00 发题 — 9 月 13 日 20:00 提交。以下三份文档是赛前到赛中的主线指引，发给队员保存。</p>
+    <div class="cd" id="cd"></div>
+  </div>
+
+  <h2>📚  全部文档</h2>
+  <div class="cards">
+
+    <a class="c" href="数模C题作战手册.html" style="border-left-color:var(--ac)">
+      <span class="pill" style="background:var(--ac2);color:var(--ac)">赛前 1</span>
+      <h3>数模 C 题作战手册</h3>
+      <div class="sub">赛程流程 / 规则红线 / 74h 时间表 / 三人分工</div>
+      <p>赛程与关键节点、必须避开的所有坑、详细的 74 小时作战时间表、建模手/编程手/论文手的职责切分，以及针对 C 题的算法地图、论文结构要点、GitHub 资源全景与开赛前 24 小时检查清单。</p>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="c" href="赛前答疑_Python选题Agent分工与时间.html" style="border-left-color:var(--pp)">
+      <span class="pill" style="background:var(--pp2);color:var(--pp)">赛前 2</span>
+      <h3>赛前答疑 · 四问</h3>
+      <div class="sub">Python vs MATLAB / 怎么定题 / Agent 分工 / 时间预期</div>
+      <p>逐条回答"MATLAB 还有用吗"、"三人怎么投票定题"、"Agent 时代分工要不要重构"、"跑数据到底要多久"，并以 2024 国赛 A 题「板凳龙」GPT 论文为样本拆解时间与 Agent 分配。</p>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="c" href="选题作战看板.html" style="border-left-color:var(--ok)">
+      <span class="pill" style="background:#e8f5ef;color:var(--ok)">赛中 1</span>
+      <h3>选题作战看板</h3>
+      <div class="sub">明晚 18:00 发题后立刻打开</div>
+      <p>三人各自独立填写思路卡（A/B/C 题）：子问题清单、解法、数据可行性、卡点降级、信心分。汇总表自动计算平均分与最低分，并标出推荐题。带倒计时、可导出、可打印。</p>
+      <span class="arrow">→</span>
+    </a>
+
+  </div>
+
+  <div class="tip">
+    <b>使用建议：</b>三份文档对应比赛三个阶段——
+    <b>赛前 1 周</b>读「作战手册」对齐规则与时间表；<b>赛前 1 天</b>读「赛前答疑」统一认识；
+    <b>发题当晚</b>打开「选题作战看板」三人各填各的卡，22:00 前定题。
+  </div>
+
+  <div class="foot">
+    本页面与三份文档会随你的本地更新而同步刷新版本；分享链接固定，无需重新转发。
+  </div>
+
+</div>
+
+<script>
+const T0 = new Date('2026-09-10T18:00:00+08:00').getTime();
+function pad(n){return String(n).padStart(2,'0')}
+setInterval(()=>{
+  const now = Date.now();
+  const box = document.getElementById('cd');
+  if (now >= T0){
+    box.innerHTML = '<div class="cd-box"><b>已开赛</b><span>快定题</span></div>';return;
+  }
+  let d = T0 - now;
+  const dd=Math.floor(d/86400000);d%=86400000;
+  const hh=Math.floor(d/3600000);d%=3600000;
+  const mm=Math.floor(d/60000);d%=60000;
+  const ss=Math.floor(d/1000);
+  box.innerHTML = `<div class="cd-box" style="min-width:62px"><span>距开赛</span></div>
+    <div class="cd-box"><b>${dd}</b><span>天</span></div>
+    <div class="cd-box"><b>${pad(hh)}</b><span>时</span></div>
+    <div class="cd-box"><b>${pad(mm)}</b><span>分</span></div>
+    <div class="cd-box"><b>${pad(ss)}</b><span>秒</span></div>`;
+},1000);
+</script>
+</body>
+</html>
